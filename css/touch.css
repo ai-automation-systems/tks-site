@@ -1,0 +1,18 @@
+/* Сенсорные цели. Файл собирается последним, поэтому перекрывает компактные значения
+   из остальных частей — на мыши они остаются как есть. */
+@media(pointer:coarse){
+ .preview-bar a,.footer-links a,.footer-contact>a,.social a,.footer-bottom a,.photo-label a,.brief-link,.remove-file,.review-note summary,.breadcrumbs a{min-height:44px;display:flex;align-items:center}
+ .brand{min-height:44px}
+ .footer-links{gap:0 var(--sp-5)}
+ .footer-bottom{gap:0 var(--sp-5)}
+ .social{gap:var(--sp-6)}
+ .theme-toggle,.menu-toggle{width:44px;height:44px}
+ .filters button{min-height:46px}
+ .systems input{width:22px;height:22px}
+ .faq summary{padding-block:var(--sp-5)}
+ .submenu a{min-height:44px;display:flex;align-items:center}
+ .nav-links>a,.nav-group>a{min-height:52px}
+ .section-nav a{min-height:44px}
+ .list-card,.review-link,.bullet-list li{min-height:48px}
+ .case-card :is(h2,h3) a,.case-dimensions{min-height:auto}
+}
