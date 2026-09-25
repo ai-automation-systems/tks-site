@@ -1,5 +1,5 @@
 from pathlib import Path
-import re,json,html,shutil,datetime
+import re,json,html,shutil,datetime,os
 from home_photo import apply_home_photos
 from all_photos import apply_all_photos
 from identity import apply_identity
@@ -11,9 +11,16 @@ SOURCE=(ROOT/'content/source.txt').read_text()
 PUBLISH=False
 SITE='https://tentsbv.ru'
 # Плавающая кнопка обратной связи. Ссылку на MAX заменить на рабочую перед публикацией.
-TG_URL='https://t.me/tentsbv_sale'
+TG_URL='https://t.me/+79309183075'
 MAX_URL='https://max.ru/'
 YEAR=datetime.date.today().year
+# Префикс для предпросмотра на адресе вида github.io/название/. На своём домене оставить пустым.
+BASE=os.environ.get('SITE_BASE','').rstrip('/')
+def rebase(t):
+ if not BASE:return t
+ t=re.sub(r'(href|src|action)="/(?!/)',lambda m:f'{m.group(1)}="{BASE}/',t)
+ t=re.sub(r'srcset="([^"]*)"',lambda m:'srcset="'+','.join((BASE+x.strip() if x.strip().startswith('/') else x) for x in m.group(1).split(','))+'"',t)
+ return t
 # Порядок важен: токены объявляются до компонентов.
 CSS_PARTS=['tokens.css','style.css','home-photo.css','all-photos.css','brand.css','fab.css','touch.css']
 def e(s): return html.escape(str(s),quote=True)
@@ -251,7 +258,7 @@ from img_tag import best as img_best
 
 # CSS собирается до генерации страниц: в ссылки подставляется хеш содержимого,
 # иначе браузер продолжит отдавать старую версию из кэша после обновления сайта.
-(ROOT/'css/site.css').write_text('\n'.join((ROOT/'css'/part).read_text() for part in CSS_PARTS))
+(ROOT/'css/site.css').write_text('\n'.join((ROOT/'css'/part).read_text() for part in CSS_PARTS).replace('url(/fonts/','url('+BASE+'/fonts/'))
 def stamp(path):
  import hashlib
  return hashlib.md5((ROOT/path).read_bytes()).hexdigest()[:8]
@@ -305,7 +312,7 @@ def layout(p,body):
  body=apply_all_photos(p,body)
  return '<!DOCTYPE html>\n<html lang="ru"><head>'+head(p)+'</head><body class="'+('home-page' if p['url']=='/' else 'inner-page')+'">'+header(p['url'])+'<main id="main">'+body+'</main>'+footer()+mobile_cta()+fab()+'</body></html>'
 def write(url,content):
- dest=ROOT/url.strip('/')/'index.html';dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(apply_identity(content))
+ dest=ROOT/url.strip('/')/'index.html';dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(rebase(apply_identity(content)))
 
 def build_page(p):
  path=p['url'];ss=parse_page(p);hero=ss.pop(0);home=path=='/'
@@ -356,7 +363,7 @@ for id,c in cases.items():
 
 
 notfound='<section class="hero inner-hero"><div class="shell"><p class="eyebrow">Ошибка 404</p><h1>Страница не найдена</h1><div class="hero-description"><p>Возможно, ссылка устарела или адрес набран с ошибкой. Вернитесь на главную или выберите раздел в меню.</p><a class="button" href="/">На главную'+icon('arrow')+'</a></div></div></section>'
-(ROOT/'404.html').write_text(apply_identity(layout(dict(url='/404.html',title='Страница не найдена | Тентовые конструкции'),notfound)).replace('<meta name="robots" content="index,follow">','<meta name="robots" content="noindex,nofollow">').replace('<link rel="canonical" href="'+SITE+'/404.html">',''))
+(ROOT/'404.html').write_text(rebase(apply_identity(layout(dict(url='/404.html',title='Страница не найдена | Тентовые конструкции'),notfound)).replace('<meta name="robots" content="index,follow">','<meta name="robots" content="noindex,nofollow">').replace('<link rel="canonical" href="'+SITE+'/404.html">','')))
 all_urls=[p['url'] for p in pages]+[c['url'] for id,c in cases.items() if id!='P04']
 if PUBLISH:
  (ROOT/'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n')
