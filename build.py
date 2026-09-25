@@ -10,9 +10,9 @@ SOURCE=(ROOT/'content/source.txt').read_text()
 # Включать только после замены SITE на настоящий домен: от него считаются canonical, og-теги и sitemap.
 PUBLISH=False
 SITE='https://tentsbv.ru'
-# Плавающая кнопка обратной связи. Ссылку на MAX заменить на рабочую перед публикацией.
+# Плавающая кнопка обратной связи. Ссылка на профиль MAX — из приложения (аватар, QR-код, «Поделиться»).
 TG_URL='https://t.me/+79309183075'
-MAX_URL='https://max.ru/'
+MAX_URL='https://max.ru/u/f9LHodD0cOKQBGliDNw6x-4RhdUvum-wPFsfeLLjZmzKhFHcrkmc59rNsNM'
 YEAR=datetime.date.today().year
 # Префикс для предпросмотра на адресе вида github.io/название/. На своём домене оставить пустым.
 BASE=os.environ.get('SITE_BASE','').rstrip('/')
