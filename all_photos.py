@@ -22,7 +22,7 @@ def grid(xs,cls='',sizes='grid-2'):
 def cp(id,n=0):return M['cases'][id][n]
 P=M['production'];T=M['technology'];O=M['gallery']['Офис']
 hero_by_url={
- '/angary/':cp('P07'),'/angary/sklady/':cp('P14'),'/angary/remontnye-masterskie/':cp('P05'),'/angary/proizvodstvennye/':cp('P26'),'/angary/dlya-tehniki/':cp('P20'),'/angary/sportivnye/':cp('P15'),'/angary/selskohozyaystvennye/':P[2],'/angary/gotovye/':P[2],'/technology/':cp('P14',1),'/proektirovanie/':dict(P[0],caption='Проектирование каркасной конструкции · иллюстрация производителя'),'/production/':P[2],'/montazh/':cp('P09',1),'/dostavka/':P[5],'/process/':P[4],'/raschet/':cp('P07'),'/about/':P[2],'/tendery/':O[2],'/contacts/':O[0],'/projects/':cp('P11'),'/about/team/':O[2],'/career/':P[2],'/gallery/':P[2],'/materials/':cp('P14',1),'/materials/pokrytie-angara/':T[22],'/materials/teplyy-angar/':cp('P05'),'/materials/podgotovka-ploshchadki/':T[0],'/materials/stoimost-angara/':cp('P07'),'/materials/proverka-proizvodstva/':P[2]}
+ '/angary/':cp('P07'),'/angary/sklady/':cp('P14'),'/angary/remontnye-masterskie/':cp('P05'),'/angary/proizvodstvennye/':cp('P26'),'/angary/dlya-tehniki/':cp('P20'),'/angary/sportivnye/':cp('P15'),'/angary/selskohozyaystvennye/':P[2],'/angary/gotovye/':P[2],'/technology/':cp('P14',1),'/proektirovanie/':dict(P[0],caption='Проектирование каркасной конструкции · иллюстрация производителя'),'/production/':P[2],'/montazh/':cp('P09',1),'/dostavka/':P[5],'/process/':P[4],'/raschet/':cp('P07'),'/about/':P[2],'/tendery/':P[3],'/contacts/':P[0],'/projects/':cp('P11'),'/about/team/':P[2],'/career/':cp('P05'),'/gallery/':P[2],'/materials/':cp('P14',1),'/materials/pokrytie-angara/':T[22],'/materials/teplyy-angar/':cp('P05'),'/materials/podgotovka-ploshchadki/':T[0],'/materials/stoimost-angara/':cp('P07'),'/materials/proverka-proizvodstva/':P[2]}
 manifest=json.loads((ROOT/'content/manifest.json').read_text()) if (ROOT/'content/manifest.json').exists() else {}
 case_paths={x['url']:x['id'] for x in manifest.get('projects',[])}
 def apply_all_photos(p,body):
@@ -31,7 +31,7 @@ def apply_all_photos(p,body):
  id=case_paths.get(path)
  selected=cp(id) if id else hero_by_url.get(path)
  if not selected:return body
- complex_hero=path in ['/raschet/','/about/team/','/gallery/','/materials/']
+ complex_hero=path in ['/raschet/','/gallery/','/materials/']
  def hero(m):
   content=m.group(1);tail=''
   if complex_hero:
@@ -74,9 +74,7 @@ def apply_all_photos(p,body):
  if path=='/dostavka/':section('section-1',[P[4]]);section('section-2',[P[5]])
  if path=='/montazh/':section('section-2',M['cases']['P09'][1:3])
  if path=='/proektirovanie/':section('section-2',[dict(P[0],caption='Каркасная конструкция · иллюстрация производителя')])
- if path=='/contacts/':section('section-2',O[1:3])
  if path=='/about/':section('section-1',[P[1],P[2]])
- if path=='/career/':section('section-1',[O[2]])
  if path=='/materials/pokrytie-angara/':
   for n,i in [(1,22),(2,24),(3,25)]:section('section-'+str(n),[T[i]])
  if path=='/materials/teplyy-angar/':section('section-1',[T[23],T[24]]);section('section-2',[T[13],T[14]])
@@ -95,7 +93,7 @@ def apply_all_photos(p,body):
   gallery='<section class="section case-gallery-section"><div class="shell"><p class="eyebrow">Фотографии объекта</p><h2>'+e(p['h1'])+'</h2>'+grid(M['cases'][id],'case-gallery')+'</div></section>'
   body=body.replace('<section class="contact-banner"',gallery+'<section class="contact-banner"',1)
  if path=='/gallery/':
-  groups=[('Металлоконструкции',M['gallery']['Цех металлоконструкций']),('Тентовый цех',M['gallery']['Тентовый цех']),('Офис',O),('Проекты',[cp(k) for k in ['P01','P07','P09','P14','P15','P20']])]
+  groups=[('Металлоконструкции',M['gallery']['Цех металлоконструкций']),('Тентовый цех',M['gallery']['Тентовый цех']),('Проекты',[cp(k) for k in ['P01','P07','P09','P14','P15','P20']])]
   albums='<section class="section"><div class="shell filter-section gallery-albums"><div class="filters" role="group" aria-label="Разделы галереи">'+''.join(f'<button type="button" data-filter="{c}" aria-pressed="{str(i==0).lower()}">{c}</button>' for i,c in enumerate(['Все']+[x[0] for x in groups]))+'</div><p class="filter-status" role="status"></p><div class="album-grid">'
   for category,xs in groups:
    for x in xs:albums+=f'<div class="filter-card" data-category="{category}">'+photo(x,sizes='grid-3')+'</div>'
