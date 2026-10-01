@@ -1,0 +1,9 @@
+__pycache__/
+.DS_Store
+
+# Служебные материалы, не для публикации (лежат только локально)
+content/source.txt
+content/photo-sources.json
+content/fetch_photos.py
+content/fetch_all_photos.py
+content/all-photos.full.json

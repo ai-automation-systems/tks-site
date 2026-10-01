@@ -1,0 +1,113 @@
+/* Фотографии и галереи внутренних страниц. Пропорции вместо фиксированных высот. */
+
+picture{display:contents}
+
+.photo-inner-hero{padding:var(--sp-6) 0 var(--sp-8)}
+.photo-hero-grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:clamp(var(--sp-6),4vw,var(--sp-8));align-items:center}
+.photo-hero-copy{min-width:0}
+.photo-hero-copy h1{font-size:var(--fs-3xl);line-height:1.12}
+.photo-hero-copy .hero-description>p{font-size:var(--fs-base);line-height:var(--lh-loose)}
+.photo-hero-copy .breadcrumbs{margin-bottom:var(--sp-5)}
+.photo-hero-copy .eyebrow{margin-bottom:var(--sp-4)}
+.photo-hero-extra{margin-top:var(--sp-7)}
+
+/* Карточка снимка. Контейнер принимает пропорцию самой фотографии: кадр не обрезается
+   и не обрастает полями. Высоту до загрузки резервируют width/height на самом <img>. */
+.site-photo{margin:0;min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:0;overflow:hidden;transition:border-color var(--dur-2) var(--ease),box-shadow var(--dur-3) var(--ease)}
+.site-photo:hover{border-color:var(--accent);box-shadow:var(--shadow-2)}
+.site-photo .photo-expand{position:relative;display:block;background:var(--surface-3);overflow:hidden}
+.site-photo img{display:block;width:100%;height:auto;transition:transform var(--dur-4) var(--ease)}
+.site-photo:hover img{transform:scale(1.03)}
+.site-photo figcaption{font-size:var(--fs-2xs);color:var(--text-2);padding:var(--sp-3) var(--sp-4);line-height:1.5}
+.interior-hero-photo figcaption{background:var(--surface)}
+.expand-mark{position:absolute;right:var(--sp-3);bottom:var(--sp-3);display:grid;place-items:center;width:36px;height:36px;background:var(--surface);border-radius:var(--r-sm);color:var(--accent);box-shadow:var(--shadow-2);opacity:0;transform:translateY(4px);transition:opacity var(--dur-2) var(--ease),transform var(--dur-2) var(--ease),background var(--dur-2) var(--ease),color var(--dur-2) var(--ease)}
+.expand-mark svg{width:17px;height:17px}
+.photo-expand:hover .expand-mark,.photo-expand:focus-visible .expand-mark{opacity:1;transform:none}
+.photo-expand:hover .expand-mark{background:var(--accent);color:var(--on-accent)}
+
+/* Сетки галерей. Единая пропорция 4:3 на плитку — кадры в ряду выходят
+   одного размера вместо разной высоты по пропорции исходного снимка. */
+.image-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-4);align-items:start;margin:var(--sp-5) 0 var(--sp-2)}
+.image-gallery .site-photo:only-child{max-width:680px;grid-column:1/-1}
+.section-full .image-gallery{grid-template-columns:repeat(3,minmax(0,1fr))}
+.section-full .image-gallery .site-photo:only-child{grid-column:1/-1}
+.case-gallery{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:var(--sp-6)}
+.album-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-5);align-items:start}
+.image-gallery .photo-expand,.album-grid .photo-expand{aspect-ratio:4/3}
+.image-gallery .site-photo img,.album-grid .site-photo img{height:100%;object-fit:cover}
+
+/* Обложка карточки проекта — тоже в натуральную пропорцию. */
+.with-photo{padding-top:0;overflow:hidden}
+.case-image-link{display:block;margin:calc(var(--sp-6) * -1) calc(var(--sp-6) * -1) var(--sp-5);flex-shrink:0;overflow:hidden;background:var(--surface-3)}
+.case-image-link img{display:block;width:100%;height:auto;transition:transform var(--dur-4) var(--ease)}
+.case-card:hover .case-image-link img{transform:scale(1.04)}
+
+/* ЕДИНАЯ ФОРМА ОБЛОЖЕК. Снимки обрезаны по центру до 4:3, чтобы карточки
+   в ряду совпадали по размеру (было выключено — обложки заканчивались на разной высоте). */
+.case-image-link{aspect-ratio:4/3}
+.case-image-link img{height:100%;object-fit:cover}
+.home-page .case-photo{aspect-ratio:4/3}
+.home-page .case-photo img{height:100%;object-fit:cover}
+.case-card{border-radius:0}
+.home-page .photo-case{border-radius:0}
+.illustrated-solution{border-radius:0}
+
+/* Портреты команды в источнике квадратные (299×300), круг их не обрезает. */
+.team-portrait{display:block;width:120px;height:120px;object-fit:cover;border-radius:var(--r-full);margin:0 0 var(--sp-5);background:var(--surface-3)}
+.solution-photo{margin:calc(var(--sp-6) * -1) calc(var(--sp-6) * -1) var(--sp-5);border:0;border-radius:0;flex-shrink:0}
+.solution-photo figcaption{font-size:var(--fs-2xs);padding:var(--sp-2) var(--sp-5);background:var(--surface-3)}
+.solution-photo .photo-expand{aspect-ratio:4/3}
+.solution-photo img{height:100%;object-fit:cover}
+.illustrated-solution>.icon{display:none}
+.material-photo-card{display:grid;grid-template-columns:164px minmax(0,1fr) 24px;gap:var(--sp-5);align-items:center;min-height:130px}
+.material-photo-card img{width:164px;height:auto;border-radius:var(--r-sm)}
+
+/* ── Просмотрщик ───────────────────────────────────────────── */
+.photo-dialog{border:0;padding:0;background:var(--surface);border-radius:var(--r-lg);width:min(1180px,94vw);max-width:94vw;max-height:94dvh;box-shadow:var(--shadow-4);overflow:hidden;color:var(--text)}
+.photo-dialog::backdrop{background:rgb(6 18 34 / .82);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.photo-dialog[open]{display:flex;flex-direction:column;animation:dialog-in var(--dur-3) var(--ease)}
+@keyframes dialog-in{from{opacity:0;transform:scale(.97) translateY(8px)}to{opacity:1;transform:none}}
+.photo-dialog-toolbar{display:flex;align-items:center;gap:var(--sp-4);padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--border)}
+.photo-dialog-caption{font-size:var(--fs-sm);line-height:1.4;margin:0;flex:1;min-width:0}
+.photo-dialog-counter{font-size:var(--fs-xs);color:var(--text-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.photo-dialog-close{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text);flex-shrink:0;transition:background var(--dur-2) var(--ease),border-color var(--dur-2) var(--ease)}
+.photo-dialog-close:hover{background:var(--surface-2);border-color:var(--accent);color:var(--accent)}
+.photo-dialog-close svg{width:19px;height:19px}
+.photo-dialog-stage{position:relative;display:grid;place-items:center;background:var(--surface-2);flex:1;min-height:0}
+/* max-width ставится из JS по натуральному размеру: мелкие снимки больше не растягиваются. */
+.photo-dialog-image{display:block;width:auto;max-width:100%;height:auto;max-height:100%;object-fit:contain}
+.photo-nav{position:absolute;top:50%;translate:0 -50%;display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--border);border-radius:var(--r-full);background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--text);box-shadow:var(--shadow-2);transition:background var(--dur-2) var(--ease),color var(--dur-2) var(--ease),opacity var(--dur-2) var(--ease)}
+.photo-nav:hover{background:var(--accent);color:var(--on-accent)}
+.photo-nav svg{width:21px;height:21px}
+.photo-prev{left:var(--sp-4)}
+.photo-next{right:var(--sp-4)}
+.photo-nav[disabled]{opacity:.3;cursor:default}
+.photo-nav[disabled]:hover{background:color-mix(in srgb,var(--surface) 88%,transparent);color:var(--text)}
+.photo-dialog[data-single=true] .photo-nav,.photo-dialog[data-single=true] .photo-dialog-counter{display:none}
+
+@media(max-width:1199px){
+ .photo-hero-grid{gap:var(--sp-6)}
+ .section-full .image-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:1023px){
+ .photo-hero-grid{grid-template-columns:1fr;gap:var(--sp-5)}
+ .photo-hero-copy .hero-description>p{max-width:var(--measure)}
+ .album-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:767px){
+ .photo-inner-hero{padding:var(--sp-5) 0 var(--sp-6)}
+ .photo-hero-copy h1{overflow-wrap:break-word}
+ .photo-hero-extra{margin-top:var(--sp-5)}
+ .image-gallery,.section-full .image-gallery,.case-gallery,.album-grid{grid-template-columns:1fr;gap:var(--sp-3)}
+ .case-image-link{margin-inline:calc(var(--sp-5) * -1)}
+ .team-portrait{width:104px;height:104px}
+ .solution-photo{margin-inline:calc(var(--sp-5) * -1)}
+ .material-photo-card{grid-template-columns:96px minmax(0,1fr) 20px;gap:var(--sp-3);min-height:110px;font-size:var(--fs-sm)}
+ .material-photo-card img{width:96px;height:auto}
+ .photo-dialog{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0}
+ .photo-dialog-toolbar{padding:var(--sp-2) var(--sp-3);gap:var(--sp-2)}
+ .photo-dialog-caption{font-size:var(--fs-xs)}
+ .photo-nav{width:42px;height:42px}
+ .photo-prev{left:var(--sp-2)}
+ .photo-next{right:var(--sp-2)}
+}

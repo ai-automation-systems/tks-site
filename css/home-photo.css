@@ -1,0 +1,90 @@
+/* Главная: реальные объекты и производство. Изолировано от внутренних страниц. */
+
+.home-page .home-hero{padding:var(--sp-8) 0 var(--sp-9)}
+.home-page .hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(var(--sp-6),4.5vw,var(--sp-9));align-items:center}
+.home-page .hero-copy h1{margin-bottom:var(--sp-5)}
+.home-page .hero-copy .eyebrow{margin-bottom:var(--sp-5)}
+
+/* Первый экран: снимок объекта с затемнением снизу, чтобы плашка читалась на любой фотографии. */
+.hero-photo{margin:0;position:relative;aspect-ratio:3/4;overflow:hidden;border-radius:var(--r-lg);background:var(--surface-4);box-shadow:var(--shadow-3)}
+.hero-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-photo::after{content:'';position:absolute;inset:auto 0 0;height:58%;background:linear-gradient(180deg,transparent,rgb(8 24 43 / .72));pointer-events:none}
+.photo-label{position:absolute;z-index:1;bottom:var(--sp-4);left:var(--sp-4);right:var(--sp-4);padding:var(--sp-5);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);display:grid;gap:var(--sp-1);border-radius:var(--r-md);box-shadow:var(--shadow-3)}
+.photo-label>span{font-size:var(--fs-2xs);color:var(--text-2);letter-spacing:var(--track-wide);text-transform:uppercase}
+.photo-label strong{font-size:var(--fs-md);letter-spacing:var(--track-tight);font-weight:var(--fw-semi);line-height:1.35}
+.photo-label a{display:flex;align-items:center;gap:var(--sp-1);font-size:var(--fs-xs);color:var(--accent);padding-top:var(--sp-1);min-height:32px}
+.photo-label .icon{width:14px;height:14px;transition:transform var(--dur-2) var(--ease)}
+.photo-label a:hover .icon{transform:translate(2px,-2px)}
+
+.home-page .fact-strip{padding-block:var(--sp-6)}
+.home-page #section-1 .info-card{min-height:300px}
+
+/* Раздел комплектации: фотография слева, перечень блоков справа. */
+.home-page #section-2 .section-content{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:0 clamp(var(--sp-6),4vw,var(--sp-8));align-items:start}
+.technology-photo{grid-column:1;grid-row:2/6;align-self:start;margin:var(--sp-3) 0 0}
+.technology-photo img{width:100%;height:auto;border-radius:var(--r-md)}
+.technology-photo figcaption{font-size:var(--fs-2xs);color:var(--text-2);padding-top:var(--sp-3);line-height:1.5}
+.home-page #section-2 .section-content>p{grid-column:1/-1;margin-bottom:var(--sp-5)}
+.home-page #section-2 .section-content>.feature{grid-column:2;padding-block:var(--sp-5)}
+.home-page #section-2 .section-content>.text-link{grid-column:2}
+
+.home-page #section-3 .section-layout{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:var(--sp-6) clamp(var(--sp-6),4vw,var(--sp-8));align-items:start}
+.home-page #section-3 .section-heading{grid-column:1/-1;max-width:850px}
+.production-photo{margin:0;align-self:start;border-radius:var(--r-md);overflow:hidden;box-shadow:var(--shadow-2)}
+.production-photo img{width:100%;height:auto}
+.production-photo figcaption{padding:var(--sp-4) var(--sp-5);display:grid;grid-template-columns:1fr auto;gap:var(--sp-1) var(--sp-5);background:var(--surface-4)}
+.production-photo figcaption>span:first-child{grid-column:1/-1;font-size:var(--fs-2xs);text-transform:uppercase;letter-spacing:var(--track-wide);color:var(--text-2)}
+.production-photo figcaption strong{font-size:var(--fs-sm);font-weight:var(--fw-semi)}
+.production-photo figcaption>span:last-child{font-size:var(--fs-xs);color:var(--text-2)}
+.home-page #section-3 .button{font-size:var(--fs-xs)}
+
+/* Карточки объектов с обложкой во всю ширину карточки. */
+.home-page #section-4 .card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-6)}
+.home-page .photo-case{padding:0 var(--sp-6) var(--sp-5);overflow:hidden;min-height:0}
+.home-page .case-photo{display:block;margin:0 calc(var(--sp-6) * -1) var(--sp-5);overflow:hidden;border-bottom:1px solid var(--border)}
+.home-page .case-photo img{width:100%;height:auto;display:block;transition:transform var(--dur-4) var(--ease)}
+.home-page .photo-case:hover .case-photo img{transform:scale(1.04)}
+.home-page .photo-case :is(h2,h3){font-size:var(--fs-lg);max-width:90%}
+.home-page .photo-case .text-link{margin-top:auto}
+
+.home-page #section-6{background:var(--surface-3)}
+.home-page #section-6 .section-layout{grid-template-columns:1fr 1.15fr;gap:clamp(var(--sp-6),4vw,var(--sp-8));align-items:start}
+.home-page #section-8{background:var(--surface-4)}
+.home-page #section-8 .section-layout{grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:0 clamp(var(--sp-6),4.5vw,var(--sp-9))}
+.home-page #section-8 .section-heading{grid-column:1;grid-row:1}
+.home-page #section-8 .section-content{grid-column:1;grid-row:2;padding-top:var(--sp-5)}
+.home-final-form{grid-column:2;grid-row:1/3;padding-top:var(--sp-2)}
+.home-page #section-8 .section-content>.button{background:transparent;border:0;color:var(--accent);padding:0;min-height:44px;justify-content:flex-start;text-align:left;font-size:var(--fs-sm);box-shadow:none}
+.home-page #section-8 .section-content>.button:hover{background:transparent;color:var(--accent-hover);box-shadow:none}
+
+@media(max-width:1199px){
+ .home-page #section-2 .section-content{gap:0 var(--sp-6)}
+}
+@media(max-width:1023px){
+ .home-page .hero-grid{grid-template-columns:1fr;gap:var(--sp-6)}
+ .hero-photo{aspect-ratio:3/4}
+ .photo-label{max-width:440px;right:auto}
+ .home-page #section-2 .section-content{grid-template-columns:1fr}
+ .technology-photo{grid-column:1;grid-row:auto;margin-bottom:var(--sp-4)}
+ .home-page #section-2 .section-content>.feature,.home-page #section-2 .section-content>.text-link{grid-column:1}
+ .home-page #section-3 .section-layout{grid-template-columns:1fr}
+ .home-page #section-6 .section-layout{grid-template-columns:1fr;gap:var(--sp-5)}
+ .home-page #section-8 .section-layout{grid-template-columns:1fr}
+ .home-final-form{grid-column:1;grid-row:3;padding-top:var(--sp-6)}
+}
+@media(max-width:767px){
+ .home-page .home-hero{padding:var(--sp-6) 0 var(--sp-7)}
+ .hero-photo{border-radius:var(--r-md)}
+ .photo-label{left:var(--sp-3);right:var(--sp-3);bottom:var(--sp-3);padding:var(--sp-4);max-width:none}
+ .home-page #section-1 .info-card{min-height:0}
+ .home-page #section-2 .section-content{gap:0}
+ .technology-photo{margin-top:var(--sp-1)}
+ .home-page #section-3 .section-layout{gap:var(--sp-5)}
+ .production-photo figcaption{padding:var(--sp-3) var(--sp-4)}
+ .home-page #section-4 .card-grid{grid-template-columns:1fr;gap:var(--sp-4)}
+ .home-page .photo-case{padding:0 var(--sp-5) var(--sp-4)}
+ .home-page .case-photo{margin:0 calc(var(--sp-5) * -1) var(--sp-4)}
+ .home-page .photo-case :is(h2,h3){max-width:none}
+ .home-page #section-8 .section-content>.button{width:auto}
+ .home-final-form .form-grid{grid-template-columns:1fr}
+}
