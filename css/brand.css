@@ -30,3 +30,6 @@
  .brand .tks-symbol{width:34px;height:34px}
  .brand .tks-wordmark{font-size:var(--fs-lg)}
 }
+
+/* Кнопка связи через MAX рядом с телефоном на контактах — фирменный значок вместо иконки-стрелки впереди текста. */
+.brand-link img{flex-shrink:0;border-radius:var(--r-full)}

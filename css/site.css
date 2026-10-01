@@ -780,6 +780,9 @@ picture{display:contents}
  .brand .tks-wordmark{font-size:var(--fs-lg)}
 }
 
+/* Кнопка связи через MAX рядом с телефоном на контактах — фирменный значок вместо иконки-стрелки впереди текста. */
+.brand-link img{flex-shrink:0;border-radius:var(--r-full)}
+
 /* Плавающая кнопка обратной связи: Telegram и MAX. */
 .fab{position:fixed;right:clamp(var(--sp-4),2.2vw,var(--sp-6));bottom:clamp(var(--sp-4),2.2vw,var(--sp-6));z-index:45;display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-3)}
 

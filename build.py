@@ -196,6 +196,12 @@ def render_lines(lines,p,section=''):
   if l.startswith('Категории:'):
    cats=l.partition(':')[2].strip().rstrip('.').split(' / ')
    out.append('<div class="gallery-grid">'+''.join(f'<a class="gallery-card" href="{("/projects/" if c=="Проекты" else "/production/" if c!="Офис" else "/contacts/")}">{icon("factory" if c!="Проекты" else "hangar")}<h2>{e(c)}</h2>{icon("arrow")}</a>' for c in cats)+'</div>');continue
+  if l.startswith('Кнопка MAX:'):
+   v=l.partition(':')[2].strip()
+   if '→' in v:
+    label,target=v.split('→',1)
+    out.append(f'<a class="text-link brand-link" href="{e(resolve(target.strip()))}"><img src="/img/logos/max.svg" alt="" width="22" height="22" loading="lazy" decoding="async">{e(label.strip())}'+icon('arrow')+'</a>')
+   continue
   if l.startswith(('Кнопка:','Вторая кнопка:','Ссылка:','Вторая ссылка:')):
    k,v=l.split(':',1);v=v.strip()
    if '→' in v: label,target=v.split('→',1);out.append(link(label.strip(),resolve(target),'button' if k=='Кнопка' else 'text-link'))
