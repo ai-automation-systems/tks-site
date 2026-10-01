@@ -253,7 +253,7 @@ def mobile_cta():
  # Постоянный доступ к звонку и расчёту на телефоне: в шапке для них нет места.
  return '<div class="mobile-cta"><a class="cta-call" href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a class="cta-quote" href="/raschet/">Рассчитать ангар</a></div>'
 def footer():
- return '<footer class="footer"><div class="shell footer-grid"><div><a class="brand" href="/">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><p>Проектируем, производим и монтируем каркасные ангары. Доставка по России.</p></div><div class="footer-links">'+''.join(f'<a href="{u}">{e(labels[u])}</a>' for u in ['/angary/','/technology/','/projects/','/production/','/tendery/','/materials/','/career/','/gallery/'])+'</div><div class="footer-contact"><a href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a href="mailto:info@tentsbv.ru">info@tentsbv.ru</a><div class="social"><a href="https://t.me/tentsbv_sale" target="_blank" rel="noopener">Telegram'+icon('external')+'</a><a href="https://vk.com/tentsbv" target="_blank" rel="noopener">ВКонтакте'+icon('external')+'</a></div></div></div><div class="shell footer-bottom"><span>© '+str(YEAR)+' Тентовые конструкции</span></div></footer>'
+ return '<footer class="footer"><div class="shell footer-grid"><div><a class="brand" href="/">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><p>Проектируем, производим и монтируем каркасные ангары. Доставка по России.</p></div><div class="footer-links">'+''.join(f'<a href="{u}">{e(labels[u])}</a>' for u in ['/angary/','/technology/','/projects/','/production/','/tendery/','/materials/','/career/','/gallery/'])+'</div><div class="footer-contact"><a href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a href="mailto:t-karkas@yandex.ru">t-karkas@yandex.ru</a><div class="social"><a href="https://t.me/tentsbv_sale" target="_blank" rel="noopener">Telegram'+icon('external')+'</a><a href="https://vk.com/tentsbv" target="_blank" rel="noopener">ВКонтакте'+icon('external')+'</a></div></div></div><div class="shell footer-bottom"><span>© '+str(YEAR)+' Тентовые конструкции</span></div></footer>'
 
 from img_tag import best as img_best
 
@@ -274,7 +274,7 @@ def share_image():
 THEME_BOOT='<script>(function(){try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t;}catch(e){}})()</script>'
 
 def jsonld(p):
- org={'@context':'https://schema.org','@type':'Organization','name':'Тентовые конструкции','url':SITE,'telephone':'+7 800 600-46-26','email':'info@tentsbv.ru','address':{'@type':'PostalAddress','postalCode':'394020','addressLocality':'Воронеж','streetAddress':'ул. Антонова-Овсеенко, д. 1, кв. 30'},'sameAs':['https://t.me/tentsbv_sale','https://vk.com/tentsbv']}
+ org={'@context':'https://schema.org','@type':'Organization','name':'Тентовые конструкции','url':SITE,'telephone':'+7 800 600-46-26','email':'t-karkas@yandex.ru','address':{'@type':'PostalAddress','postalCode':'394020','addressLocality':'Воронеж','streetAddress':'ул. Антонова-Овсеенко, д. 1, кв. 30'},'sameAs':['https://t.me/tentsbv_sale','https://vk.com/tentsbv']}
  crumbs=[{'@type':'ListItem','position':1,'name':'Главная','item':SITE+'/'}]
  if p['url']!='/':crumbs.append({'@type':'ListItem','position':2,'name':labels.get(p['url'],p.get('h1','')),'item':SITE+p['url']})
  data=[org,{'@context':'https://schema.org','@type':'BreadcrumbList','itemListElement':crumbs}]
