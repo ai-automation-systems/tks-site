@@ -12,5 +12,8 @@ def apply_identity(html):
  html=re.sub(r'<div class="header-contact">.*?</div>','<a class="header-phone" href="tel:+79309183075">+7 (930) 918-30-75</a>',html,flags=re.S)
  # У партнёра один общий номер без внутренних линий — старые «добавочный N» после него убираем.
  html=re.sub(r'(\+7 \(930\) 918-30-75|\+7 930 918-30-75),? добавочный \d+',r'\1',html)
+ # Загрузки файлов на сайте нет: тексты зовут прислать ТЗ почтой, поэтому адрес в тексте делаем кликабельным.
+ html=re.sub(r'(?<![">])на (t-karkas@yandex\.ru)',
+             r'на <a href="mailto:\1">\1</a>', html)
  html=html.replace('<div class="shell footer-bottom">',LEGAL+'<div class="shell footer-bottom">')
  return html

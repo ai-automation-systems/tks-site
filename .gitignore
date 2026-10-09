@@ -7,3 +7,6 @@ content/photo-sources.json
 content/fetch_photos.py
 content/fetch_all_photos.py
 content/all-photos.full.json
+
+# Локальный конфиг предпросмотра
+.claude/

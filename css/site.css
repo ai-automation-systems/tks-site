@@ -498,6 +498,14 @@ small{font-size:var(--fs-xs)}
  .project-spec{position:static;max-width:700px}
  .section-nav{top:0}
 }
+/* Узкие телефоны (iPhone SE первых поколений, 320–359 px): подпись у логотипа
+   вместе с кнопками не влезает в строку и выталкивает шапку за край экрана. */
+@media(max-width:359px){
+ .brand .tks-description{display:none}
+ .header-inner{gap:var(--sp-3)}
+}
+/* Почтовый адрес в тексте не рвём по дефису: «t-karkas@yandex.ru» должен читаться целиком. */
+a[href^="mailto:"]{white-space:nowrap;hyphens:none;-webkit-hyphens:none}
 @media(max-width:767px){
  :root{--pad:20px}
  .mobile-cta{display:flex}
