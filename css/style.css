@@ -9,7 +9,7 @@
 .preview-bar .icon{width:16px;height:16px}
 
 /* ── Шапка ─────────────────────────────────────────────────── */
-.header{position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border)}
+.header{position:sticky;top:0;z-index:30;background:var(--bg);background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border)}
 @supports not (backdrop-filter:blur(1px)){.header{background:var(--bg)}}
 .header-inner{display:flex;align-items:center;gap:var(--sp-5);min-height:var(--header-h)}
 .brand{display:flex;align-items:center;gap:var(--sp-3);flex-shrink:0}
@@ -134,7 +134,7 @@
 .inner-hero h1{max-width:22ch;margin-bottom:var(--sp-5);font-size:var(--fs-3xl)}
 .inner-hero .hero-description{max-width:100%}
 .inner-hero .hero-description>p,.inner-hero .wide-hero>p{max-width:var(--measure)}
-.section-nav{background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:var(--header-h);z-index:10}
+.section-nav{background:var(--bg);background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border);position:sticky;top:var(--header-h);z-index:10}
 .section-nav>.shell{display:flex;gap:var(--sp-2);padding-block:var(--sp-3);overflow-x:auto;scrollbar-width:none}
 .section-nav>.shell::-webkit-scrollbar{display:none}
 .section-nav a{white-space:nowrap;font-size:var(--fs-xs);font-weight:var(--fw-medium);min-height:40px;display:flex;align-items:center;border-radius:var(--r-full);padding:var(--sp-2) var(--sp-4);background:var(--surface-3);transition:background var(--dur-2) var(--ease),color var(--dur-2) var(--ease)}
@@ -246,7 +246,7 @@
 .review-note a{color:var(--accent);text-decoration:underline}
 
 /* ── Липкая панель действий на телефоне ────────────────────── */
-.mobile-cta{display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;padding:var(--sp-2) var(--pad) calc(var(--sp-2) + env(safe-area-inset-bottom));gap:var(--sp-2);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border)}
+.mobile-cta{display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;padding:var(--sp-2) var(--pad) calc(var(--sp-2) + env(safe-area-inset-bottom));gap:var(--sp-2);background:var(--bg);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border)}
 /* min-width:0 обязателен: иначе flex-элемент не сжимается уже своего текста и панель вылезает за экран. */
 .mobile-cta>a{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:var(--sp-2);min-height:50px;padding-inline:var(--sp-2);border-radius:var(--r-sm);font-size:var(--fs-sm);font-weight:var(--fw-semi);white-space:nowrap}
 .mobile-cta .cta-call{border:1px solid var(--border-field);color:var(--text)}

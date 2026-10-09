@@ -15,4 +15,6 @@
  .section-nav a{min-height:44px}
  .list-card,.review-link,.bullet-list li{min-height:48px}
  .case-card :is(h2,h3) a,.case-dimensions{min-height:auto}
+ .quiz-check{min-height:44px;align-items:center}
+ .quiz-option{min-height:52px}
 }

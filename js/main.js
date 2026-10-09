@@ -39,13 +39,18 @@ function lockScroll(on) {
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('.nav');
 const isMobileNav = () => getComputedStyle(menuButton).display !== 'none';
+let menuLocked = false;
 function setMenu(open) {
  const was = navigation.classList.contains('open');
  if (was === open) return;
  navigation.classList.toggle('open', open);
  menuButton.setAttribute('aria-expanded', String(open));
  menuButton.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
- if (isMobileNav()) lockScroll(open);
+ // Снимать замок нужно по тому, ставили ли мы его, а не по текущей ширине экрана:
+ // иначе поворот телефона меняет вёрстку на широкую, разблокировка не срабатывает
+ // и страница остаётся непрокручиваемой.
+ if (open && isMobileNav()) { menuLocked = true; lockScroll(true); }
+ else if (!open && menuLocked) { menuLocked = false; lockScroll(false); }
 }
 function closeSubmenus() {
  document.querySelectorAll('.nav-group.open').forEach(el => {
@@ -70,7 +75,21 @@ document.addEventListener('keydown', event => {
  else if (navigation.classList.contains('open')) { setMenu(false); menuButton.focus(); }
 });
 navigation.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
-addEventListener('resize', () => { if (!isMobileNav() && navigation.classList.contains('open')) setMenu(false); });
+function releaseMenu() {
+ if (isMobileNav()) return;
+ if (navigation.classList.contains('open')) setMenu(false);
+ if (menuLocked) { menuLocked = false; lockScroll(false); }
+}
+addEventListener('resize', releaseMenu);
+addEventListener('orientationchange', releaseMenu);
+// matchMedia срабатывает ровно в момент смены раскладки — надёжнее, чем resize,
+// который на мобильных браузерах приходит не всегда.
+matchMedia('(min-width: 1024px)').addEventListener('change', releaseMenu);
+// Возврат «назад» из кеша браузера не перезапускает скрипт: снимаем замок вручную,
+// иначе страница откроется незрокручиваемой.
+addEventListener('pageshow', () => {
+ if (!navigation.classList.contains('open') && menuLocked) { menuLocked = false; lockScroll(false); }
+});
 
 /* ── Фильтры ───────────────────────────────────────────────── */
 document.querySelectorAll('.filter-section').forEach(section => {
@@ -105,7 +124,7 @@ const incomingPurpose = purposeMap[params.get('purpose')];
 if (incomingPurpose) document.querySelectorAll('[name="purpose"]').forEach(el => el.value = incomingPurpose);
 const projectId = params.get('project');
 if (projectId) fetch('/js/content-map.json').then(r => r.json()).then(map => {
- if (!Object.hasOwn(map, projectId)) return;
+ if (!Object.prototype.hasOwnProperty.call(map, projectId)) return;
  document.querySelectorAll('.form-context').forEach(el => { el.hidden = false; el.textContent = 'Выбранный проект: ' + map[projectId].title; });
 }).catch(() => {});
 if (params.has('ready') || params.get('type') === 'ready') document.querySelectorAll('.form-context').forEach(el => {

@@ -37,8 +37,10 @@ YEAR=datetime.date.today().year
 # подтверждается один раз письмом «Activate Form».
 # Заявки уходят через FormSubmit на почту компании: регистрации и ключа не нужно,
 # адрес подтверждается один раз письмом. Точка /ajax/ отвечает JSON и не уводит со страницы.
-FORM_MAIL='t-karkas@yandex.ru'
-FORM_ENDPOINT='https://formsubmit.co/ajax/'+FORM_MAIL
+# Алиас вместо самого адреса: почта не светится в коде страницы и её не соберут спам-боты.
+# Письма приходят на t-karkas@yandex.ru.
+FORM_ALIAS='179461fe167381d4fb7303a3bca787b0'
+FORM_ENDPOINT='https://formsubmit.co/ajax/'+FORM_ALIAS
 # Метки источника: подставляются из адреса страницы и запоминаются на время визита.
 UTM_FIELDS=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','referrer']
 # Префикс для предпросмотра на адресе вида github.io/название/. На своём домене оставить пустым.
@@ -374,8 +376,20 @@ def layout(p,body):
  if QUIZ_SLOT in body:
   body=body.replace(QUIZ_SLOT,render_quiz('quote-form','',FORM_ENDPOINT,UTM_FIELDS,icon('arrow')))
  return '<!DOCTYPE html>\n<html lang="ru"><head>'+head(p)+'</head><body class="'+('home-page' if p['url']=='/' else 'inner-page')+'">'+(YM_BODY if PUBLISH else '')+header(p['url'])+'<main id="main">'+body+'</main>'+footer()+mobile_cta()+fab()+'</body></html>'
+
+# Типографика: число и единица измерения не должны разрываться переносом строки
+# («200 м²» уезжало на две строки на узком экране). Меняется только пробел,
+# сами слова остаются как есть. Работает по тексту между тегами, разметку не трогает.
+UNITS=r'м²|мм|см|км|м|т|кг|шт|%|₽|°C|года|лет'
+def typography(html):
+ def fix(chunk):
+  chunk=re.sub(r'(\d)\s+(' + UNITS + r')(?![а-яёa-z])', '\\1\u00a0\\2', chunk)
+  chunk=re.sub(r'(?<=[\s>(])([вксоиуая]|из|по|на|до|от|за|не|но)\s+(?=[А-Яа-яЁё])', '\\1\u00a0', chunk)
+  return chunk
+ return ''.join(part if i % 2 else fix(part) for i, part in enumerate(re.split(r'(<[^>]*>)', html)))
+
 def write(url,content):
- dest=ROOT/url.strip('/')/'index.html';dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(rebase(apply_identity(content)))
+ dest=ROOT/url.strip('/')/'index.html';dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(typography(rebase(apply_identity(content))))
 
 def build_page(p):
  path=p['url'];ss=parse_page(p);hero=ss.pop(0);home=path=='/'
@@ -426,7 +440,7 @@ for id,c in cases.items():
 
 
 notfound='<section class="hero inner-hero"><div class="shell"><p class="eyebrow">Ошибка 404</p><h1>Страница не найдена</h1><div class="hero-description"><p>Возможно, ссылка устарела или адрес набран с ошибкой. Вернитесь на главную или выберите раздел в меню.</p><a class="button" href="/">На главную'+icon('arrow')+'</a></div></div></section>'
-(ROOT/'404.html').write_text(rebase(apply_identity(layout(dict(url='/404.html',title='Страница не найдена | Тентовые конструкции'),notfound)).replace('<meta name="robots" content="index,follow">','<meta name="robots" content="noindex,nofollow">').replace('<link rel="canonical" href="'+SITE+'/404.html">','')))
+(ROOT/'404.html').write_text(typography(rebase(apply_identity(layout(dict(url='/404.html',title='Страница не найдена | Тентовые конструкции'),notfound)).replace('<meta name="robots" content="index,follow">','<meta name="robots" content="noindex,nofollow">').replace('<link rel="canonical" href="'+SITE+'/404.html">',''))))
 all_urls=[p['url'] for p in pages]+[c['url'] for id,c in cases.items() if id!='P04']
 if PUBLISH:
  (ROOT/'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n')
