@@ -13,6 +13,21 @@ SITE='https://t-karkas.ru'
 # Плавающая кнопка обратной связи. Ссылка на профиль MAX — из приложения (аватар, QR-код, «Поделиться»).
 TG_URL='https://t.me/+79309183075'
 MAX_URL='https://max.ru/u/f9LHodD0cOKQBGliDNw6x-4RhdUvum-wPFsfeLLjZmzKhFHcrkmc59rNsNM'
+# Яндекс.Метрика (счётчик партнёра). Ставится только в режиме публикации, чтобы локальные сборки не портили статистику.
+YM_ID=113580272
+YM_HEAD='''<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=%(id)s', 'ym');
+
+    ym(%(id)s, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<!-- /Yandex.Metrika counter -->''' % {'id':YM_ID}
+YM_BODY='<noscript><div><img src="https://mc.yandex.ru/watch/%d" style="position:absolute; left:-9999px;" alt="" /></div></noscript>' % YM_ID
 YEAR=datetime.date.today().year
 # Префикс для предпросмотра на адресе вида github.io/название/. На своём домене оставить пустым.
 BASE=os.environ.get('SITE_BASE','').rstrip('/')
@@ -304,7 +319,7 @@ def head(p):
   '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
   '<link rel="preload" href="/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>',
   '<link rel="preload" href="/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>',
-  f'<link rel="stylesheet" href="/css/site.css?v={CSS_V}">',f'<script defer src="/js/main.js?v={JS_V}"></script>',THEME_BOOT,jsonld(p)]
+  f'<link rel="stylesheet" href="/css/site.css?v={CSS_V}">',f'<script defer src="/js/main.js?v={JS_V}"></script>',THEME_BOOT]+([YM_HEAD] if PUBLISH else [])+[jsonld(p)]
  return ''.join(tags)
 
 def fab():
@@ -317,7 +332,7 @@ def fab():
   +'</div><button class="fab-toggle" type="button" aria-expanded="false" aria-controls="fab-menu" aria-label="Написать нам"><span class="fab-tip">Написать нам</span>'+chat+close+'</button></div>')
 def layout(p,body):
  body=apply_all_photos(p,body)
- return '<!DOCTYPE html>\n<html lang="ru"><head>'+head(p)+'</head><body class="'+('home-page' if p['url']=='/' else 'inner-page')+'">'+header(p['url'])+'<main id="main">'+body+'</main>'+footer()+mobile_cta()+fab()+'</body></html>'
+ return '<!DOCTYPE html>\n<html lang="ru"><head>'+head(p)+'</head><body class="'+('home-page' if p['url']=='/' else 'inner-page')+'">'+(YM_BODY if PUBLISH else '')+header(p['url'])+'<main id="main">'+body+'</main>'+footer()+mobile_cta()+fab()+'</body></html>'
 def write(url,content):
  dest=ROOT/url.strip('/')/'index.html';dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(rebase(apply_identity(content)))
 
