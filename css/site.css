@@ -554,12 +554,11 @@ small{font-size:var(--fs-xs)}
 .footer-bottom{align-items:center}
 .footer-author{display:inline-flex;align-items:center;gap:var(--sp-2);color:var(--text-2);transition:color var(--dur-2) var(--ease)}
 .footer-author span{font-size:var(--fs-2xs);letter-spacing:var(--track-wide);white-space:nowrap}
-/* Знак студии оптически тяжелее текста, поэтому приглушён и чуть приподнят к базовой линии. */
-.footer-author img{height:15px;width:auto;opacity:.62;position:relative;top:-1px;transition:opacity var(--dur-2) var(--ease)}
-/* На тёмном фоне знак теряется сильнее, чем на светлом. */
-:root[data-theme=dark] .footer-author img,html.theme-dark .footer-author img{opacity:.78}
+/* SVG через <img> не наследует цвет страницы, поэтому знак рисуется маской:
+   заливка берётся из currentColor и совпадает с цветом соседнего текста в любой теме. */
+.footer-author-mark{display:block;width:71px;height:15px;position:relative;top:-1px;background-color:currentColor;opacity:.62;transition:opacity var(--dur-2) var(--ease);-webkit-mask:url(/img/logos/2vlad.svg) no-repeat center/contain;mask:url(/img/logos/2vlad.svg) no-repeat center/contain}
 .footer-author:hover{color:var(--text)}
-.footer-author:hover img{opacity:1}
+.footer-author:hover .footer-author-mark{opacity:1}
 
 @media(max-width:1023px){
  .header-call span{display:none}

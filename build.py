@@ -32,12 +32,13 @@ YM_SCRIPT_ID='<script>window.YM_ID=%d</script>' % YM_ID
 YM_BODY='<noscript><div><img src="https://mc.yandex.ru/watch/%d" style="position:absolute; left:-9999px;" alt="" /></div></noscript>' % YM_ID
 YEAR=datetime.date.today().year
 
-# Приём заявок. Сайт статический, своего сервера нет, поэтому форма уходит через Web3Forms
-# на почту, указанную при регистрации ключа (t-karkas@yandex.ru).
-# FORM_KEY — публичный access key с web3forms.com, прятать его не нужно.
-# Пока ключ пустой, форма работает в режиме проверки и ничего не отправляет.
-FORM_KEY=''
-FORM_ENDPOINT='https://api.web3forms.com/submit'
+# Приём заявок. Сайт статический, своего сервера нет, поэтому форма уходит через
+# FormSubmit на почту компании. Регистрации и ключа не требуется: адрес
+# подтверждается один раз письмом «Activate Form».
+# Заявки уходят через FormSubmit на почту компании: регистрации и ключа не нужно,
+# адрес подтверждается один раз письмом. Точка /ajax/ отвечает JSON и не уводит со страницы.
+FORM_MAIL='t-karkas@yandex.ru'
+FORM_ENDPOINT='https://formsubmit.co/ajax/'+FORM_MAIL
 # Метки источника: подставляются из адреса страницы и запоминаются на время визита.
 UTM_FIELDS=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','referrer']
 # Префикс для предпросмотра на адресе вида github.io/название/. На своём домене оставить пустым.
@@ -153,16 +154,15 @@ def form(mode='short',uid='request-form',button=None):
   fs+=field('Кран-балка: грузоподъёмность и операции','crane','textarea',wide=True)+field('Пожелания по срокам и особые требования','timing','textarea',wide=True)
  if mode=='tender':fs+=field('Ссылка или номер закупки','tender',wide=True)
  fs+=field('Комментарий' if mode!='short' else 'Несколько слов о задаче','comment','textarea',wide=True)
- if mode!='short':fs+='<label class="field wide file-field"><span>Прикрепить техническое задание'+(' или план площадки' if mode=='brief' else '')+'</span><input type="file" name="attachment" accept=".pdf,.doc,.docx,.xls,.xlsx,.dwg,.dxf,.zip,.rar,.jpg,.jpeg,.png,image/*,application/pdf"><button class="remove-file" type="button" hidden>Удалить файл</button></label>'
  button=button or {'short':'Обсудить проект','quote':'Получить предварительный расчёт','brief':'Отправить задание на расчёт','tender':'Отправить запрос в тендерный отдел'}[mode]
  # Скрытые поля заполняет main.js: источник перехода и страница, с которой ушла заявка.
- hidden=('<input type="hidden" name="access_key" value="'+FORM_KEY+'">'
-  '<input type="hidden" name="subject" value="Заявка с сайта t-karkas.ru">'
-  '<input type="hidden" name="from_name" value="Сайт ТКС">'
-  '<input type="hidden" name="botcheck" class="hidden" style="display:none">'
+ hidden=('<input type="hidden" name="_subject" value="Заявка с сайта t-karkas.ru">'
+  '<input type="hidden" name="_template" value="table">'
+  '<input type="hidden" name="_captcha" value="false">'
+  '<input type="checkbox" name="_honey" style="display:none" tabindex="-1" aria-hidden="true" autocomplete="off">'
   +''.join(f'<input type="hidden" name="{n}" data-utm="{n}">' for n in UTM_FIELDS)
   +'<input type="hidden" name="page" data-page>')
- note='' if (FORM_KEY or PUBLISH) else '<p class="preview-note">Локальная сборка: FORM_KEY не задан, заявка не отправится.</p>'
+ note=''
  return (f'<form class="form form-{mode}" id="{uid}" action="{FORM_ENDPOINT}" method="post" novalidate>'
   +hidden+'<div class="form-grid">'+fs.replace('{uid}',uid)
   +f'</div><p class="form-context" hidden></p><div class="form-bottom">'
@@ -311,7 +311,7 @@ def mobile_cta():
  # Постоянный доступ к звонку и расчёту на телефоне: в шапке для них нет места.
  return '<div class="mobile-cta"><a class="cta-call" href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a class="cta-quote" href="/raschet/">Рассчитать ангар</a></div>'
 def footer():
- return '<footer class="footer"><div class="shell footer-grid"><div><a class="brand" href="/">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><p>Проектируем, производим и монтируем каркасные ангары. Доставка по России.</p></div><div class="footer-links">'+''.join(f'<a href="{u}">{e(labels[u])}</a>' for u in ['/angary/','/technology/','/projects/','/production/','/tendery/','/materials/','/career/','/gallery/'])+'</div><div class="footer-contact"><a href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a href="mailto:t-karkas@yandex.ru">t-karkas@yandex.ru</a><div class="social"><a class="brand-link" href="'+MAX_URL+'" target="_blank" rel="noopener"><img src="/img/logos/max.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Написать нам в MAX'+icon('external')+'</a></div></div></div><div class="shell footer-bottom"><span>© '+str(YEAR)+' Тентовые конструкции</span><a class="footer-author" href="https://2vlad.ru" target="_blank" rel="noopener" data-goal="author_click"><span>Сделано в</span><img src="/img/logos/2vlad.svg" alt="2VLAD" width="71" height="20" loading="lazy" decoding="async"></a></div></footer>'
+ return '<footer class="footer"><div class="shell footer-grid"><div><a class="brand" href="/">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><p>Проектируем, производим и монтируем каркасные ангары. Доставка по России.</p></div><div class="footer-links">'+''.join(f'<a href="{u}">{e(labels[u])}</a>' for u in ['/angary/','/technology/','/projects/','/production/','/tendery/','/materials/','/career/','/gallery/'])+'</div><div class="footer-contact"><a href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a href="mailto:t-karkas@yandex.ru">t-karkas@yandex.ru</a><div class="social"><a class="brand-link" href="'+MAX_URL+'" target="_blank" rel="noopener"><img src="/img/logos/max.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Написать нам в MAX'+icon('external')+'</a></div></div></div><div class="shell footer-bottom"><span>© '+str(YEAR)+' Тентовые конструкции</span><a class="footer-author" href="https://2vlad.ru" target="_blank" rel="noopener" data-goal="author_click"><span>Сделано в</span><span class="footer-author-mark" aria-hidden="true"></span><span class="sr-only">2VLAD</span></a></div></footer>'
 
 from img_tag import best as img_best
 
@@ -372,7 +372,7 @@ QUIZ_SLOT='<!--quiz-slot-->'
 def layout(p,body):
  body=apply_all_photos(p,body)
  if QUIZ_SLOT in body:
-  body=body.replace(QUIZ_SLOT,render_quiz('quote-form',FORM_KEY,FORM_ENDPOINT,UTM_FIELDS,icon('arrow')))
+  body=body.replace(QUIZ_SLOT,render_quiz('quote-form','',FORM_ENDPOINT,UTM_FIELDS,icon('arrow')))
  return '<!DOCTYPE html>\n<html lang="ru"><head>'+head(p)+'</head><body class="'+('home-page' if p['url']=='/' else 'inner-page')+'">'+(YM_BODY if PUBLISH else '')+header(p['url'])+'<main id="main">'+body+'</main>'+footer()+mobile_cta()+fab()+'</body></html>'
 def write(url,content):
  dest=ROOT/url.strip('/')/'index.html';dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(rebase(apply_identity(content)))

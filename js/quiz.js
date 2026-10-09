@@ -124,14 +124,8 @@
   status.hidden = false;
   status.textContent = 'Отправляем…';
 
-  if (!form.action || !form.querySelector('[name=access_key]').value) {
-   status.textContent = 'Отправка заявок временно недоступна. Позвоните нам: +7 (930) 918-30-75';
-   button.disabled = false;
-   return;
-  }
   try {
-   const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
-   if (!res.ok) throw new Error(res.status);
+   await window.sendForm(form);
    goal('form_submit');
    form.querySelector('.quiz-body').hidden = true;
    nav.hidden = true;

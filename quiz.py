@@ -91,8 +91,6 @@ def _contacts(idx, total):
             f'<p class="quiz-step-num">Шаг {total} из {total}</p>'
             f'<h2>{e(c["title"])}</h2><p class="quiz-sub">{e(c["subtitle"])}</p>'
             f'<div class="quiz-contact-grid">{"".join(rows)}</div>'
-            f'<label class="quiz-field quiz-file"><span>Прикрепить техническое задание или план площадки</span>'
-            f'<input type="file" name="attachment" accept=".pdf,.doc,.docx,.xls,.xlsx,.dwg,.dxf,.zip,.rar,.jpg,.jpeg,.png,image/*,application/pdf"></label>'
             f'<label class="quiz-check"><input type="checkbox" name="messenger" value="Да">'
             f'<span>{e(c["messenger"])}</span></label>'
             f'<label class="quiz-check"><input type="checkbox" name="consent" value="Да" required>'
@@ -112,10 +110,10 @@ def quiz(uid='quiz', form_key='', endpoint='', utm_fields=(), arrow=''):
              + ''.join(f'<li>{e(b)}</li>' for b in i['bullets'])
              + f'</ul><button type="button" class="button quiz-start">{e(i["button"])}{arrow}</button>'
              f'</div></section>')
-    hidden = ('<input type="hidden" name="access_key" value="' + form_key + '">'
-              '<input type="hidden" name="subject" value="Расчёт с сайта t-karkas.ru">'
-              '<input type="hidden" name="from_name" value="Квиз ТКС">'
-              '<input type="hidden" name="botcheck" style="display:none">'
+    hidden = ('<input type="hidden" name="_subject" value="Расчёт с сайта t-karkas.ru">'
+              '<input type="hidden" name="_template" value="table">'
+              '<input type="hidden" name="_captcha" value="false">'
+              '<input type="checkbox" name="_honey" style="display:none" tabindex="-1" aria-hidden="true" autocomplete="off">'
               + ''.join(f'<input type="hidden" name="{n}" data-utm="{n}">' for n in utm_fields)
               + '<input type="hidden" name="page" data-page>'
               '<input type="hidden" name="answers" data-answers>')

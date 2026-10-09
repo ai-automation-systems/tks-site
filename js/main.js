@@ -135,20 +135,11 @@ document.querySelectorAll('form').forEach(form => {
   }
   const status = form.querySelector('.form-status');
   const button = form.querySelector('[type=submit]');
-  const key = form.querySelector('[name=access_key]');
   status.hidden = false;
-
-  // Пока приёмник не настроен, форма не делает вид, что приняла заявку,
-  // а предлагает позвонить — это единственный рабочий канал в такой момент.
-  if (!form.action || !key || !key.value) {
-   status.textContent = 'Отправка заявок временно недоступна. Позвоните нам: +7 (930) 918-30-75';
-   return;
-  }
   button.disabled = true;
   status.textContent = 'Отправляем…';
   try {
-   const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
-   if (!res.ok) throw new Error(res.status);
+   await sendForm(form);
    form.querySelector('.form-grid').hidden = true;
    form.querySelector('.form-bottom').hidden = true;
    status.textContent = 'Заявка отправлена. Свяжемся с вами в течение рабочего дня.';
@@ -296,3 +287,39 @@ if (photoLinks.length) {
   input.value = location.pathname + location.search;
  });
 })();
+
+/* Письмо должно читаться человеком, поэтому поля уезжают с русскими подписями,
+   а не как name="utm_source". FormSubmit подставляет ключи JSON прямо в письмо. */
+const FIELD_LABELS = {
+ name: 'Имя', phone: 'Телефон', email: 'Почта', company: 'Компания',
+ purpose: 'Назначение ангара', location: 'Место строительства', comment: 'Комментарий',
+ tender: 'Закупка', messenger: 'Удобен мессенджер', answers: 'Ответы на вопросы',
+ page: 'Страница заявки', referrer: 'Источник перехода',
+ utm_source: 'Источник', utm_medium: 'Канал', utm_campaign: 'Кампания',
+ utm_content: 'Объявление', utm_term: 'Запрос'
+};
+const SERVICE_FIELDS = ['_subject', '_template', '_captcha', '_honey', 'consent'];
+function buildPayload(form) {
+ const data = {};
+ new FormData(form).forEach((value, key) => {
+  if (typeof value !== 'string' || !value.trim()) return;
+  if (SERVICE_FIELDS.includes(key)) { data[key] = value; return; }
+  const label = FIELD_LABELS[key] || key;
+  data[label] = data[label] ? data[label] + ', ' + value : value;
+ });
+ ['_subject', '_template', '_captcha'].forEach(k => {
+  const el = form.querySelector(`[name="${k}"]`);
+  if (el) data[k] = el.value;
+ });
+ return data;
+}
+window.sendForm = async function (form) {
+ const res = await fetch(form.action, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+  body: JSON.stringify(buildPayload(form))
+ });
+ const out = await res.json().catch(() => ({}));
+ if (!res.ok || out.success === 'false' || out.success === false) throw new Error(out.message || res.status);
+ return out;
+}
