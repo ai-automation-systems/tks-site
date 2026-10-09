@@ -1,7 +1,7 @@
 /* Плавающая кнопка обратной связи: Telegram и MAX. */
-.fab{position:fixed;right:clamp(var(--sp-4),2.2vw,var(--sp-6));bottom:clamp(var(--sp-4),2.2vw,var(--sp-6));z-index:45;display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-3)}
+.fab{position:fixed;right:clamp(var(--sp-4),2.2vw,var(--sp-6));bottom:clamp(var(--sp-4),2.2vw,var(--sp-6));z-index:45;display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-3);pointer-events:none}
 
-.fab-toggle{position:relative;display:grid;place-items:center;width:64px;height:64px;padding:0;border:0;border-radius:var(--r-full);background:var(--accent);color:var(--on-accent);cursor:pointer;box-shadow:0 10px 28px color-mix(in srgb,var(--accent) 42%,transparent),var(--shadow-3);transition:transform var(--dur-3) var(--ease),box-shadow var(--dur-3) var(--ease)}
+.fab-toggle{pointer-events:auto;position:relative;display:grid;place-items:center;width:64px;height:64px;padding:0;border:0;border-radius:var(--r-full);background:var(--accent);color:var(--on-accent);cursor:pointer;box-shadow:0 10px 28px color-mix(in srgb,var(--accent) 42%,transparent),var(--shadow-3);transition:transform var(--dur-3) var(--ease),box-shadow var(--dur-3) var(--ease)}
 .fab-toggle:hover{transform:translateY(-2px) scale(1.04)}
 .fab-toggle:active{transform:scale(.96)}
 .fab-toggle::before{content:'';position:absolute;inset:0;border-radius:inherit;border:2px solid var(--accent);opacity:0;animation:fab-pulse 2.6s var(--ease) 1.2s 4}
@@ -35,3 +35,8 @@
 @media(prefers-reduced-motion:reduce){
  .fab-toggle::before{animation:none}
 }
+
+/* Прячется, когда виден подвал: там контакты уже есть, а кружок перекрывал подпись. */
+.fab{transition:opacity var(--dur-3) var(--ease),transform var(--dur-3) var(--ease)}
+.fab-tucked{opacity:0;transform:translateY(14px) scale(.9)}
+.fab-tucked .fab-toggle{pointer-events:none}

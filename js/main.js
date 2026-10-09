@@ -1,4 +1,4 @@
-/* Локальный макет: тема, навигация, фильтры, просмотр фотографий, проверка форм. Внешних зависимостей нет. */
+/* Тема, навигация, фильтры, просмотр фотографий, формы и метки источника. Без внешних библиотек. */
 'use strict';
 
 const SVG = (d, w = 1.7) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
@@ -125,16 +125,37 @@ document.querySelectorAll('form').forEach(form => {
   input.addEventListener('change', () => remove.hidden = !input.files.length);
   remove.addEventListener('click', () => { input.value = ''; remove.hidden = true; input.focus(); });
  });
- form.addEventListener('submit', event => {
+ form.addEventListener('submit', async event => {
   event.preventDefault();
   if (phone && phone.value.replace(/\D/g, '').length < 7) {
    phone.setCustomValidity('Укажите номер телефона');
    phone.reportValidity();
+   phone.setCustomValidity('');
    return;
   }
   const status = form.querySelector('.form-status');
+  const button = form.querySelector('[type=submit]');
+  const key = form.querySelector('[name=access_key]');
   status.hidden = false;
-  status.textContent = 'Поля заполнены. Это локальный макет: заявка не отправлена. Данные остались в форме.';
+
+  // Пока приёмник не настроен, форма не делает вид, что приняла заявку,
+  // а предлагает позвонить — это единственный рабочий канал в такой момент.
+  if (!form.action || !key || !key.value) {
+   status.textContent = 'Отправка заявок временно недоступна. Позвоните нам: +7 (930) 918-30-75';
+   return;
+  }
+  button.disabled = true;
+  status.textContent = 'Отправляем…';
+  try {
+   const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+   if (!res.ok) throw new Error(res.status);
+   form.querySelector('.form-grid').hidden = true;
+   form.querySelector('.form-bottom').hidden = true;
+   status.textContent = 'Заявка отправлена. Свяжемся с вами в течение рабочего дня.';
+  } catch (err) {
+   status.textContent = 'Не удалось отправить. Позвоните нам: +7 (930) 918-30-75';
+   button.disabled = false;
+  }
  });
 });
 
@@ -223,5 +244,55 @@ if (photoLinks.length) {
   document.addEventListener('keydown', e => {
    if (e.key === 'Escape' && fab.classList.contains('open')) { set(false); toggle.focus(); }
   });
+
+  // У подвала кнопка убирается: там уже есть телефон, почта и мессенджер,
+  // а висящий кружок перекрывает подпись и реквизиты.
+  const footer = document.querySelector('.footer');
+  if (footer && 'IntersectionObserver' in window) {
+   new IntersectionObserver(entries => {
+    const atFooter = entries[0].isIntersecting;
+    if (atFooter) set(false);
+    fab.classList.toggle('fab-tucked', atFooter);
+   }, { rootMargin: '0px 0px -40px 0px' }).observe(footer);
+  }
  }
 }
+
+/* ── Цели Яндекс.Метрики: звонки и переходы в контакты ─────── */
+(function () {
+ const goal = (name) => { try { if (window.ym && window.YM_ID) ym(window.YM_ID, 'reachGoal', name); } catch (e) {} };
+ document.addEventListener('click', event => {
+  const el = event.target.closest('a,button');
+  if (!el) return;
+  // Явная метка на элементе имеет приоритет над догадкой по ссылке.
+  const explicit = el.dataset.goal;
+  if (explicit) goal(explicit);
+  const href = el.getAttribute('href') || '';
+  if (href.startsWith('tel:')) goal('call_click');
+  else if (/^\/contacts\/?$/.test(href)) goal('contacts_view');
+ }, { capture: true });
+ // Заявка обычной формы (квиз шлёт свою цель сам).
+ document.querySelectorAll('form:not([data-quiz])').forEach(f =>
+  f.addEventListener('submit', () => goal('form_submit')));
+})();
+
+/* ── Метки источника ───────────────────────────────────────── */
+/* Параметры перехода запоминаются на весь визит: человек приходит по рекламе
+   на любую страницу, а заявку оставляет позже на /raschet/ — метка не должна потеряться. */
+(function () {
+ const KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+ const store = (k, v) => { try { sessionStorage.setItem(k, v); } catch (e) {} };
+ const load = (k) => { try { return sessionStorage.getItem(k) || ''; } catch (e) { return ''; } };
+
+ const q = new URLSearchParams(location.search);
+ KEYS.forEach(k => { const v = q.get(k); if (v) store(k, v); });
+ // Источник перехода запоминаем только при первом заходе, иначе его затрёт свой же домен.
+ if (!load('referrer')) store('referrer', document.referrer || 'прямой заход');
+
+ document.querySelectorAll('[data-utm]').forEach(input => {
+  input.value = input.dataset.utm === 'referrer' ? load('referrer') : load(input.dataset.utm);
+ });
+ document.querySelectorAll('[data-page]').forEach(input => {
+  input.value = location.pathname + location.search;
+ });
+})();
