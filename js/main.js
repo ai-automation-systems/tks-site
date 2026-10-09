@@ -340,6 +340,10 @@ function buildPayload(form) {
 // Сервис может на мгновение отказать при всплеске обращений — делаем одну
 // повторную попытку, терять заявку из-за секундного сбоя нельзя.
 window.sendForm = async function (form) {
+ // Скрытую галочку видят только боты. Отсекаем на своей стороне и молча:
+ // бот не должен понять, что его отбраковали, а квота сервиса не тратится.
+ const honey = form.querySelector('[name="_honey"]');
+ if (honey && honey.checked) return { success: 'true', skipped: true };
  const body = JSON.stringify(buildPayload(form));
  let last;
  for (let attempt = 0; attempt < 2; attempt++) {
