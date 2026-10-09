@@ -317,12 +317,17 @@ const FIELD_LABELS = {
  utm_source: 'Источник', utm_medium: 'Канал', utm_campaign: 'Кампания',
  utm_content: 'Объявление', utm_term: 'Запрос'
 };
-const SERVICE_FIELDS = ['_subject', '_template', '_captcha', '_honey', 'consent'];
+const SERVICE_FIELDS = ['_subject', '_template', '_captcha', '_honey'];
+const SKIP_FIELDS = ['consent', '_honey'];
 function buildPayload(form) {
  const data = {};
  new FormData(form).forEach((value, key) => {
   if (typeof value !== 'string' || !value.trim()) return;
+  if (SKIP_FIELDS.includes(key)) return;
   if (SERVICE_FIELDS.includes(key)) { data[key] = value; return; }
+  // Ответы квиза уже собраны в читаемый блок «Ответы на вопросы»,
+  // поэтому сырые поля шагов (q0_purpose и подобные) в письмо не дублируем.
+  if (/^q\d+_/.test(key)) return;
   const label = FIELD_LABELS[key] || key;
   data[label] = data[label] ? data[label] + ', ' + value : value;
  });
