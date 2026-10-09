@@ -337,13 +337,25 @@ function buildPayload(form) {
  });
  return data;
 }
+// Сервис может на мгновение отказать при всплеске обращений — делаем одну
+// повторную попытку, терять заявку из-за секундного сбоя нельзя.
 window.sendForm = async function (form) {
- const res = await fetch(form.action, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-  body: JSON.stringify(buildPayload(form))
- });
- const out = await res.json().catch(() => ({}));
- if (!res.ok || out.success === 'false' || out.success === false) throw new Error(out.message || res.status);
- return out;
+ const body = JSON.stringify(buildPayload(form));
+ let last;
+ for (let attempt = 0; attempt < 2; attempt++) {
+  if (attempt) await new Promise(r => setTimeout(r, 1500));
+  try {
+   const res = await fetch(form.action, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body
+   });
+   const out = await res.json().catch(() => ({}));
+   if (res.ok && out.success !== 'false' && out.success !== false) return out;
+   last = new Error(out.message || res.status);
+  } catch (err) {
+   last = err;
+  }
+ }
+ throw last;
 }
