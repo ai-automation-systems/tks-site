@@ -1,13 +1,13 @@
 /* Главная: реальные объекты и производство. Изолировано от внутренних страниц. */
 
 .home-page .home-hero{padding:var(--sp-8) 0 var(--sp-9)}
-.home-page .hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(var(--sp-6),4.5vw,var(--sp-9));align-items:center}
+.home-page .hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(var(--sp-6),4.5vw,var(--sp-9));align-items:stretch}
 .home-page .hero-copy h1{margin-bottom:var(--sp-5)}
 .home-page .hero-copy .eyebrow{margin-bottom:var(--sp-5)}
 
 /* Первый экран: снимок объекта с затемнением снизу, чтобы плашка читалась на любой фотографии. */
-.hero-photo{margin:0;position:relative;aspect-ratio:3/4;overflow:hidden;border-radius:var(--r-lg);background:var(--surface-4);box-shadow:var(--shadow-3)}
-.hero-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-photo{margin:0;position:relative;min-height:100%;overflow:hidden;border-radius:var(--r-lg);background:var(--surface-4);box-shadow:var(--shadow-3)}
+.hero-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 45%;display:block}
 .hero-photo::after{content:'';position:absolute;inset:auto 0 0;height:58%;background:linear-gradient(180deg,transparent,rgb(8 24 43 / .72));pointer-events:none}
 .photo-label{position:absolute;z-index:1;bottom:var(--sp-4);left:var(--sp-4);right:var(--sp-4);padding:var(--sp-5);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);display:grid;gap:var(--sp-1);border-radius:var(--r-md);box-shadow:var(--shadow-3)}
 .photo-label>span{font-size:var(--fs-2xs);color:var(--text-2);letter-spacing:var(--track-wide);text-transform:uppercase}
@@ -61,7 +61,9 @@
  .home-page #section-2 .section-content{gap:0 var(--sp-6)}
 }
 @media(max-width:1023px){
- .home-page .hero-grid{grid-template-columns:1fr;gap:var(--sp-6)}
+ .home-page .hero-grid{grid-template-columns:1fr;gap:var(--sp-6);align-items:start}
+ .hero-photo{min-height:0;aspect-ratio:4/3}
+ .hero-photo img{position:static}
  .hero-photo{aspect-ratio:3/4}
  .photo-label{max-width:440px;right:auto}
  .home-page #section-2 .section-content{grid-template-columns:1fr}

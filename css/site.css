@@ -542,16 +542,45 @@ small{font-size:var(--fs-xs)}
  .brand .icon{width:34px;height:34px}
 }
 
+/* ── Кнопки звонка и подпись студии ────────────────────────── */
+.header-call{display:inline-flex;align-items:center;gap:var(--sp-2);min-height:44px;padding:0 var(--sp-4);border:1px solid var(--accent);border-radius:var(--r-sm);background:var(--accent);color:var(--on-accent);font-size:var(--fs-xs);font-weight:var(--fw-semi);white-space:nowrap;transition:background var(--dur-2) var(--ease),box-shadow var(--dur-2) var(--ease)}
+.header-call:hover{background:var(--accent-hover);color:var(--on-accent);box-shadow:var(--shadow-2)}
+.header-call .icon{width:16px;height:16px}
+.button-call{background:transparent;color:var(--accent);border-color:var(--accent);box-shadow:none;gap:var(--sp-3)}
+.button-call:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);box-shadow:none}
+.button-call .icon{width:17px;height:17px}
+.button-call:hover .icon{transform:none}
+
+.footer-bottom{align-items:center}
+.footer-author{display:inline-flex;align-items:center;gap:var(--sp-2);color:var(--text-2);transition:color var(--dur-2) var(--ease)}
+.footer-author span{font-size:var(--fs-2xs);letter-spacing:var(--track-wide);white-space:nowrap}
+/* Знак студии оптически тяжелее текста, поэтому приглушён и чуть приподнят к базовой линии. */
+.footer-author img{height:15px;width:auto;opacity:.62;position:relative;top:-1px;transition:opacity var(--dur-2) var(--ease)}
+/* На тёмном фоне знак теряется сильнее, чем на светлом. */
+:root[data-theme=dark] .footer-author img,html.theme-dark .footer-author img{opacity:.78}
+.footer-author:hover{color:var(--text)}
+.footer-author:hover img{opacity:1}
+
+@media(max-width:1023px){
+ .header-call span{display:none}
+ .header-call{padding:0;width:44px;height:44px;justify-content:center}
+ .header-call .icon{width:18px;height:18px}
+}
+@media(max-width:767px){
+ .button-call{width:100%;justify-content:center}
+ .footer-bottom{align-items:flex-start}
+}
+
 /* Главная: реальные объекты и производство. Изолировано от внутренних страниц. */
 
 .home-page .home-hero{padding:var(--sp-8) 0 var(--sp-9)}
-.home-page .hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(var(--sp-6),4.5vw,var(--sp-9));align-items:center}
+.home-page .hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(var(--sp-6),4.5vw,var(--sp-9));align-items:stretch}
 .home-page .hero-copy h1{margin-bottom:var(--sp-5)}
 .home-page .hero-copy .eyebrow{margin-bottom:var(--sp-5)}
 
 /* Первый экран: снимок объекта с затемнением снизу, чтобы плашка читалась на любой фотографии. */
-.hero-photo{margin:0;position:relative;aspect-ratio:3/4;overflow:hidden;border-radius:var(--r-lg);background:var(--surface-4);box-shadow:var(--shadow-3)}
-.hero-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-photo{margin:0;position:relative;min-height:100%;overflow:hidden;border-radius:var(--r-lg);background:var(--surface-4);box-shadow:var(--shadow-3)}
+.hero-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 45%;display:block}
 .hero-photo::after{content:'';position:absolute;inset:auto 0 0;height:58%;background:linear-gradient(180deg,transparent,rgb(8 24 43 / .72));pointer-events:none}
 .photo-label{position:absolute;z-index:1;bottom:var(--sp-4);left:var(--sp-4);right:var(--sp-4);padding:var(--sp-5);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(16px) saturate(180%);-webkit-backdrop-filter:blur(16px) saturate(180%);display:grid;gap:var(--sp-1);border-radius:var(--r-md);box-shadow:var(--shadow-3)}
 .photo-label>span{font-size:var(--fs-2xs);color:var(--text-2);letter-spacing:var(--track-wide);text-transform:uppercase}
@@ -605,7 +634,9 @@ small{font-size:var(--fs-xs)}
  .home-page #section-2 .section-content{gap:0 var(--sp-6)}
 }
 @media(max-width:1023px){
- .home-page .hero-grid{grid-template-columns:1fr;gap:var(--sp-6)}
+ .home-page .hero-grid{grid-template-columns:1fr;gap:var(--sp-6);align-items:start}
+ .hero-photo{min-height:0;aspect-ratio:4/3}
+ .hero-photo img{position:static}
  .hero-photo{aspect-ratio:3/4}
  .photo-label{max-width:440px;right:auto}
  .home-page #section-2 .section-content{grid-template-columns:1fr}
@@ -784,9 +815,9 @@ picture{display:contents}
 .brand-link img{flex-shrink:0;border-radius:var(--r-full)}
 
 /* Плавающая кнопка обратной связи: Telegram и MAX. */
-.fab{position:fixed;right:clamp(var(--sp-4),2.2vw,var(--sp-6));bottom:clamp(var(--sp-4),2.2vw,var(--sp-6));z-index:45;display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-3)}
+.fab{position:fixed;right:clamp(var(--sp-4),2.2vw,var(--sp-6));bottom:clamp(var(--sp-4),2.2vw,var(--sp-6));z-index:45;display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-3);pointer-events:none}
 
-.fab-toggle{position:relative;display:grid;place-items:center;width:64px;height:64px;padding:0;border:0;border-radius:var(--r-full);background:var(--accent);color:var(--on-accent);cursor:pointer;box-shadow:0 10px 28px color-mix(in srgb,var(--accent) 42%,transparent),var(--shadow-3);transition:transform var(--dur-3) var(--ease),box-shadow var(--dur-3) var(--ease)}
+.fab-toggle{pointer-events:auto;position:relative;display:grid;place-items:center;width:64px;height:64px;padding:0;border:0;border-radius:var(--r-full);background:var(--accent);color:var(--on-accent);cursor:pointer;box-shadow:0 10px 28px color-mix(in srgb,var(--accent) 42%,transparent),var(--shadow-3);transition:transform var(--dur-3) var(--ease),box-shadow var(--dur-3) var(--ease)}
 .fab-toggle:hover{transform:translateY(-2px) scale(1.04)}
 .fab-toggle:active{transform:scale(.96)}
 .fab-toggle::before{content:'';position:absolute;inset:0;border-radius:inherit;border:2px solid var(--accent);opacity:0;animation:fab-pulse 2.6s var(--ease) 1.2s 4}
@@ -820,6 +851,114 @@ picture{display:contents}
 @media(prefers-reduced-motion:reduce){
  .fab-toggle::before{animation:none}
 }
+
+/* Прячется, когда виден подвал: там контакты уже есть, а кружок перекрывал подпись. */
+.fab{transition:opacity var(--dur-3) var(--ease),transform var(--dur-3) var(--ease)}
+.fab-tucked{opacity:0;transform:translateY(14px) scale(.9)}
+.fab-tucked .fab-toggle{pointer-events:none}
+
+/* Пошаговый расчёт. Повторяет логику квиза с эталона, оформлен токенами сайта. */
+
+.quiz{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-2);margin-block:var(--sp-6)}
+
+/* ── Стартовый экран ───────────────────────────────────────── */
+.quiz-intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:stretch}
+.quiz-intro-media{position:relative;min-height:100%;background:var(--surface-3)}
+.quiz-intro-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.quiz-intro-body{padding:clamp(var(--sp-5),3vw,var(--sp-8))}
+.quiz-badge{display:inline-flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-2xs);font-weight:var(--fw-semi);letter-spacing:var(--track-wide);text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:var(--r-full);padding:var(--sp-2) var(--sp-4);margin:0 0 var(--sp-5)}
+.quiz-intro-body h2{font-size:var(--fs-xl);margin-bottom:var(--sp-5);max-width:22ch}
+.quiz-bullets{list-style:none;padding:0;margin:0 0 var(--sp-6);display:grid;gap:var(--sp-3)}
+.quiz-bullets li{position:relative;padding-left:var(--sp-6);font-size:var(--fs-sm);color:var(--text-2);line-height:1.5}
+.quiz-bullets li::before{content:'';position:absolute;left:0;top:.42em;width:7px;height:7px;border-radius:var(--r-full);background:var(--accent)}
+.quiz-start{width:100%;justify-content:space-between}
+
+/* ── Шаги ──────────────────────────────────────────────────── */
+.quiz-body{padding:clamp(var(--sp-5),3vw,var(--sp-8)) clamp(var(--sp-5),3vw,var(--sp-8)) 0}
+.quiz-step{animation:quiz-in var(--dur-3) var(--ease)}
+@keyframes quiz-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.quiz-step-num{font-size:var(--fs-2xs);font-weight:var(--fw-semi);letter-spacing:var(--track-wider);text-transform:uppercase;color:var(--text-3);margin:0 0 var(--sp-3)}
+.quiz-step h2{font-size:var(--fs-lg);max-width:30ch;margin-bottom:var(--sp-3)}
+.quiz-marks{display:flex;flex-wrap:wrap;gap:var(--sp-3);margin-bottom:var(--sp-5)}
+.quiz-hint,.quiz-skip{font-size:var(--fs-2xs);color:var(--text-3)}
+.quiz-skip{color:var(--accent)}
+.quiz-tip{background:var(--surface-2);border-radius:var(--r-md);padding:var(--sp-4) var(--sp-5);margin-bottom:var(--sp-5)}
+.quiz-tip p{font-size:var(--fs-sm);color:var(--text-2);line-height:var(--lh-relaxed);margin:0 0 .6em}
+.quiz-tip p:last-child{margin-bottom:0}
+.quiz-step-warn h2{color:#c2392f}
+.quiz-step-warn .quiz-list,.quiz-step-warn .quiz-cards,.quiz-step-warn .quiz-field{animation:quiz-shake var(--dur-3) var(--ease)}
+@keyframes quiz-shake{0%,100%{transform:none}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* ── Варианты списком ──────────────────────────────────────── */
+.quiz-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-3)}
+.quiz-option{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-4);border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);cursor:pointer;transition:border-color var(--dur-2) var(--ease),background var(--dur-2) var(--ease)}
+.quiz-option:hover{border-color:var(--accent)}
+.quiz-option input{width:20px;height:20px;accent-color:var(--accent);flex-shrink:0;margin:0}
+.quiz-option-label{font-size:var(--fs-sm);line-height:1.4}
+.quiz-option:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.quiz-option-other{flex-wrap:wrap}
+.quiz-other-input{flex:1 1 100%;min-height:44px;border:1px solid var(--border-field);border-radius:var(--r-sm);padding:var(--sp-2) var(--sp-3);background:var(--surface);color:var(--text);font-size:var(--fs-sm)}
+.quiz-other-input:disabled{opacity:.45}
+
+/* ── Варианты карточками ───────────────────────────────────── */
+.quiz-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-4)}
+.quiz-option-card{flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;position:relative}
+.quiz-option-card input{position:absolute;top:var(--sp-3);right:var(--sp-3);z-index:1}
+.quiz-card-media{display:block;aspect-ratio:4/3;background:var(--surface-2);overflow:hidden}
+.quiz-card-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform var(--dur-4) var(--ease)}
+.quiz-option-card:hover .quiz-card-media img{transform:scale(1.04)}
+.quiz-option-card .quiz-option-label{padding:var(--sp-3) var(--sp-4);font-size:var(--fs-xs);line-height:1.35}
+
+/* ── Поля ──────────────────────────────────────────────────── */
+.quiz-field{display:flex;flex-direction:column;gap:var(--sp-2);position:relative}
+.quiz-field>span{font-size:var(--fs-xs);font-weight:var(--fw-medium)}
+.quiz-field em{color:var(--accent);font-style:normal}
+.quiz-field textarea,.quiz-field input{width:100%;min-height:50px;border:1px solid var(--border-field);border-radius:var(--r-sm);background:var(--surface);color:var(--text);padding:var(--sp-3) var(--sp-4);font-size:var(--fs-base);transition:border-color var(--dur-2) var(--ease),box-shadow var(--dur-2) var(--ease)}
+.quiz-field textarea{min-height:130px;resize:vertical;line-height:var(--lh-relaxed)}
+.quiz-field textarea:focus,.quiz-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent);outline:none}
+.quiz-counter{align-self:flex-end;font-size:var(--fs-2xs);color:var(--text-3);font-variant-numeric:tabular-nums}
+.quiz-sub{font-size:var(--fs-sm);color:var(--text-2);margin-bottom:var(--sp-5);max-width:52ch}
+.quiz-contact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-4);margin-bottom:var(--sp-5)}
+.quiz-phone{display:flex;align-items:stretch;border:1px solid var(--border-field);border-radius:var(--r-sm);overflow:hidden;background:var(--surface)}
+.quiz-phone:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.quiz-phone-prefix{display:grid;place-items:center;padding-inline:var(--sp-4);background:var(--surface-2);border-right:1px solid var(--border);font-size:var(--fs-sm);font-weight:var(--fw-semi);color:var(--text-2)}
+.quiz-phone input{border:0;border-radius:0;box-shadow:none!important}
+.quiz-check{display:flex;align-items:flex-start;gap:var(--sp-3);font-size:var(--fs-xs);color:var(--text-2);line-height:1.5;cursor:pointer;margin-bottom:var(--sp-3)}
+.quiz-check input{width:20px;height:20px;accent-color:var(--accent);flex-shrink:0;margin-top:1px}
+
+/* ── Низ: прогресс и кнопки ────────────────────────────────── */
+.quiz-nav{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-5);flex-wrap:wrap;padding:var(--sp-5) clamp(var(--sp-5),3vw,var(--sp-8));margin-top:var(--sp-6);border-top:1px solid var(--border);background:var(--surface-2)}
+.quiz-progress{flex:1;min-width:200px;display:grid;gap:var(--sp-2)}
+.quiz-progress-label{font-size:var(--fs-2xs);color:var(--text-2)}
+.quiz-progress-label b{color:var(--accent);font-variant-numeric:tabular-nums}
+.quiz-progress-track{display:block;height:6px;border-radius:var(--r-full);background:var(--surface-4);overflow:hidden}
+.quiz-progress-track i{display:block;height:100%;width:0;border-radius:var(--r-full);background:var(--accent);transition:width var(--dur-3) var(--ease)}
+.quiz-nav-buttons{display:flex;align-items:center;gap:var(--sp-3)}
+.quiz-back{width:48px;height:48px;border:1px solid var(--border);border-radius:var(--r-full);background:var(--surface);color:var(--text-2);display:grid;place-items:center;transition:border-color var(--dur-2) var(--ease),color var(--dur-2) var(--ease)}
+.quiz-back::before{content:'';width:10px;height:10px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-left:3px}
+.quiz-back:hover{border-color:var(--accent);color:var(--accent)}
+.quiz-done{border-color:var(--accent);background:var(--accent-soft);margin:var(--sp-6)}
+.quiz>.preview-note{margin:var(--sp-4) clamp(var(--sp-5),3vw,var(--sp-8))!important}
+.quiz>.form-status{margin:var(--sp-4) clamp(var(--sp-5),3vw,var(--sp-8))}
+
+@media(max-width:1023px){
+ .quiz-intro{grid-template-columns:1fr}
+ .quiz-intro-media{min-height:0;aspect-ratio:16/9}
+ .quiz-intro-media img{position:static}
+ .quiz-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .quiz-contact-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:767px){
+ .quiz-list,.quiz-cards,.quiz-contact-grid{grid-template-columns:1fr}
+ .quiz-nav{flex-direction:column;align-items:stretch}
+ .quiz-nav-buttons{width:100%}
+ .quiz-next{flex:1;justify-content:space-between}
+}
+
+/* Загрузка ТЗ на шаге контактов: текст страницы обещает возможность приложить файл. */
+.quiz-file{margin-bottom:var(--sp-5)}
+.quiz-file input{padding:var(--sp-3);background:var(--surface-inset);font-size:var(--fs-sm);min-height:54px}
+.quiz-file input::file-selector-button{margin-right:var(--sp-3);padding:var(--sp-2) var(--sp-4);border:1px solid var(--border-field);border-radius:var(--r-xs);background:var(--surface);color:var(--text);font:inherit;cursor:pointer}
 
 /* Сенсорные цели. Файл собирается последним, поэтому перекрывает компактные значения
    из остальных частей — на мыши они остаются как есть. */

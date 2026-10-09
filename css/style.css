@@ -337,3 +337,32 @@
  .brand span{font-size:var(--fs-2xs)}
  .brand .icon{width:34px;height:34px}
 }
+
+/* ── Кнопки звонка и подпись студии ────────────────────────── */
+.header-call{display:inline-flex;align-items:center;gap:var(--sp-2);min-height:44px;padding:0 var(--sp-4);border:1px solid var(--accent);border-radius:var(--r-sm);background:var(--accent);color:var(--on-accent);font-size:var(--fs-xs);font-weight:var(--fw-semi);white-space:nowrap;transition:background var(--dur-2) var(--ease),box-shadow var(--dur-2) var(--ease)}
+.header-call:hover{background:var(--accent-hover);color:var(--on-accent);box-shadow:var(--shadow-2)}
+.header-call .icon{width:16px;height:16px}
+.button-call{background:transparent;color:var(--accent);border-color:var(--accent);box-shadow:none;gap:var(--sp-3)}
+.button-call:hover{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);box-shadow:none}
+.button-call .icon{width:17px;height:17px}
+.button-call:hover .icon{transform:none}
+
+.footer-bottom{align-items:center}
+.footer-author{display:inline-flex;align-items:center;gap:var(--sp-2);color:var(--text-2);transition:color var(--dur-2) var(--ease)}
+.footer-author span{font-size:var(--fs-2xs);letter-spacing:var(--track-wide);white-space:nowrap}
+/* Знак студии оптически тяжелее текста, поэтому приглушён и чуть приподнят к базовой линии. */
+.footer-author img{height:15px;width:auto;opacity:.62;position:relative;top:-1px;transition:opacity var(--dur-2) var(--ease)}
+/* На тёмном фоне знак теряется сильнее, чем на светлом. */
+:root[data-theme=dark] .footer-author img,html.theme-dark .footer-author img{opacity:.78}
+.footer-author:hover{color:var(--text)}
+.footer-author:hover img{opacity:1}
+
+@media(max-width:1023px){
+ .header-call span{display:none}
+ .header-call{padding:0;width:44px;height:44px;justify-content:center}
+ .header-call .icon{width:18px;height:18px}
+}
+@media(max-width:767px){
+ .button-call{width:100%;justify-content:center}
+ .footer-bottom{align-items:flex-start}
+}

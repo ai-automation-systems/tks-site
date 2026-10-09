@@ -3,6 +3,7 @@ import re,json,html,shutil,datetime,os
 from home_photo import apply_home_photos
 from all_photos import apply_all_photos
 from identity import apply_identity
+from quiz import quiz as render_quiz
 ROOT=Path(__file__).resolve().parent
 SOURCE=(ROOT/'content/source.txt').read_text()
 
@@ -27,8 +28,18 @@ YM_HEAD='''<!-- Yandex.Metrika counter -->
     ym(%(id)s, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
 </script>
 <!-- /Yandex.Metrika counter -->''' % {'id':YM_ID}
+YM_SCRIPT_ID='<script>window.YM_ID=%d</script>' % YM_ID
 YM_BODY='<noscript><div><img src="https://mc.yandex.ru/watch/%d" style="position:absolute; left:-9999px;" alt="" /></div></noscript>' % YM_ID
 YEAR=datetime.date.today().year
+
+# Приём заявок. Сайт статический, своего сервера нет, поэтому форма уходит через Web3Forms
+# на почту, указанную при регистрации ключа (t-karkas@yandex.ru).
+# FORM_KEY — публичный access key с web3forms.com, прятать его не нужно.
+# Пока ключ пустой, форма работает в режиме проверки и ничего не отправляет.
+FORM_KEY=''
+FORM_ENDPOINT='https://api.web3forms.com/submit'
+# Метки источника: подставляются из адреса страницы и запоминаются на время визита.
+UTM_FIELDS=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','referrer']
 # Префикс для предпросмотра на адресе вида github.io/название/. На своём домене оставить пустым.
 BASE=os.environ.get('SITE_BASE','').rstrip('/')
 def rebase(t):
@@ -37,7 +48,7 @@ def rebase(t):
  t=re.sub(r'srcset="([^"]*)"',lambda m:'srcset="'+','.join((BASE+x.strip() if x.strip().startswith('/') else x) for x in m.group(1).split(','))+'"',t)
  return t
 # Порядок важен: токены объявляются до компонентов.
-CSS_PARTS=['tokens.css','style.css','home-photo.css','all-photos.css','brand.css','fab.css','touch.css']
+CSS_PARTS=['tokens.css','style.css','home-photo.css','all-photos.css','brand.css','fab.css','quiz.css','touch.css']
 def e(s): return html.escape(str(s),quote=True)
 def val(s,k,default=''):
  m=re.search(r'^'+re.escape(k)+r': (.*)$',s,re.M);return m.group(1).strip() if m else default
@@ -104,7 +115,12 @@ def inline(s):
 
 # Подсказки автозаполнения по имени поля: без них браузер не предлагает сохранённые данные.
 AUTOFILL={'name':'name','phone':'tel','email':'email','company':'organization','location':'address-level2'}
-def field(label,name,type='text',required=False,options=None,wide=False):
+# Города и регионы, где компания уже строила, — первыми домашние Воронеж и Тамбов.
+# Поле остаётся текстовым: список подсказывает, но вписать можно любой населённый пункт.
+CITIES=['Воронеж','Тамбов','Иркутск','Иркутская область','Магаданская область','Хабаровский край',
+        'Забайкальский край','Камчатский край','Красноярский край','Республика Бурятия',
+        'Республика Саха (Якутия)','Чукотский АО']
+def field(label,name,type='text',required=False,options=None,wide=False,datalist=None):
  attrs=f'name="{name}" id="{{uid}}-{name}"'+(' required' if required else '')
  lab=f'<label class="field {"wide" if wide else ""}"><span>{e(label)}{(" <em>*</em>" if required else "")}</span>'
  if options: ctrl=f'<select {attrs}>'+''.join(f'<option value="{e(v)}">{e(v)}</option>' for v in options)+'</select>'
@@ -112,6 +128,12 @@ def field(label,name,type='text',required=False,options=None,wide=False):
  else:
   extra=(' min="0" step="any" inputmode="decimal"' if type=='number' else '')
   ac=AUTOFILL.get(name)
+  if datalist:
+   lid=f'{{uid}}-{name}-list'
+   extra+=f' list="{lid}" autocomplete="off"'
+   ctrl=f'<input {attrs} type="{type}"'+extra+'>'
+   ctrl+=f'<datalist id="{lid}">'+''.join(f'<option value="{e(v)}">' for v in datalist)+'</datalist>'
+   return lab+ctrl+'</label>'
   ctrl=f'<input {attrs} type="{type}"'+extra+(f' autocomplete="{ac}"' if ac else '')+'>'
  return lab+ctrl+'</label>'
 PURPOSES=['Не определено','Склад','Ремонтная мастерская','Производство','Техника','Спорт','Сельское хозяйство','Другое']
@@ -120,9 +142,10 @@ def form(mode='short',uid='request-form',button=None):
  if mode in ('quote','brief','tender'): fs+=field('Электронная почта','email','email')
  if mode in ('brief','tender'):fs+=field('Компания','company')
  if mode in ('quote','brief'):
-  fs+=field('Назначение ангара','purpose',options=PURPOSES)+field('Место строительства','location')
-  for name,label in [('width','Ширина, м'),('length','Длина, м'),('height','Высота внешней стены, м')]:fs+=field(label,name,'number')
+  fs+=field('Назначение ангара','purpose',options=PURPOSES)+field('Место строительства','location',datalist=CITIES)
+ # Габариты оставлены только в расширенном ТЗ: короткая форма собирает контакт и задачу.
  if mode=='brief':
+  for name,label in [('width','Ширина, м'),('length','Длина, м'),('height','Высота внешней стены, м')]:fs+=field(label,name,'number')
   fs+=field('Высота в рабочей зоне, м','working-height','number')
   for label,name,opts in [('Температурный режим','climate',['Нужна консультация','Холодное помещение','Отапливаемое помещение']),('Покрытие','cover',['Нужна помощь с подбором','ПВХ','Сэндвич-панели','Профлист']),('Тип ворот','gate-type',['Не определён','Распашные','Откатные','Секционные']),('Основание','foundation',['Пока нет данных','Есть готовое','Требуется проектное решение']),('Работы','works',['Требуется обсуждение','Изготовление и доставка','Изготовление, доставка и монтаж','Шеф-монтаж'])]:fs+=field(label,name,options=opts)
   fs+=field('Ворота: количество, ширина и высота','gates')+field('Грунт и существующая площадка','ground','textarea',wide=True)
@@ -132,7 +155,19 @@ def form(mode='short',uid='request-form',button=None):
  fs+=field('Комментарий' if mode!='short' else 'Несколько слов о задаче','comment','textarea',wide=True)
  if mode!='short':fs+='<label class="field wide file-field"><span>Прикрепить техническое задание'+(' или план площадки' if mode=='brief' else '')+'</span><input type="file" name="attachment" accept=".pdf,.doc,.docx,.xls,.xlsx,.dwg,.dxf,.zip,.rar,.jpg,.jpeg,.png,image/*,application/pdf"><button class="remove-file" type="button" hidden>Удалить файл</button></label>'
  button=button or {'short':'Обсудить проект','quote':'Получить предварительный расчёт','brief':'Отправить задание на расчёт','tender':'Отправить запрос в тендерный отдел'}[mode]
- return f'<form class="form form-{mode}" id="{uid}"><div class="form-grid">'+fs.replace('{uid}',uid)+f'</div><p class="form-context" hidden></p><div class="form-bottom"><button class="button" type="submit">{e(button)}{icon("arrow")}</button><p class="preview-note">Макет формы: данные никуда не отправляются.</p></div><p class="form-status" role="status" hidden></p></form>'
+ # Скрытые поля заполняет main.js: источник перехода и страница, с которой ушла заявка.
+ hidden=('<input type="hidden" name="access_key" value="'+FORM_KEY+'">'
+  '<input type="hidden" name="subject" value="Заявка с сайта t-karkas.ru">'
+  '<input type="hidden" name="from_name" value="Сайт ТКС">'
+  '<input type="hidden" name="botcheck" class="hidden" style="display:none">'
+  +''.join(f'<input type="hidden" name="{n}" data-utm="{n}">' for n in UTM_FIELDS)
+  +'<input type="hidden" name="page" data-page>')
+ note='' if (FORM_KEY or PUBLISH) else '<p class="preview-note">Локальная сборка: FORM_KEY не задан, заявка не отправится.</p>'
+ return (f'<form class="form form-{mode}" id="{uid}" action="{FORM_ENDPOINT}" method="post" novalidate>'
+  +hidden+'<div class="form-grid">'+fs.replace('{uid}',uid)
+  +f'</div><p class="form-context" hidden></p><div class="form-bottom">'
+  f'<button class="button" type="submit">{e(button)}{icon("arrow")}</button>{note}</div>'
+  '<p class="form-status" role="status" hidden></p></form>')
 
 def casecat(id):
  if id in ['P02','P03','P05','P06','P07','P08','P09','P10','P11','P12','P23','P24']:return 'Ремонтные мастерские'
@@ -197,10 +232,11 @@ def render_lines(lines,p,section=''):
    out.append(f'<article class="feature"><div>{icon("layers")}</div><div><h3>{e(title)}</h3>'+''.join(paras)+'</div></article>');continue
   if l=='Короткая форма:':
    while i<len(lines) and (lines[i].startswith('— ') or lines[i].startswith('Кнопка:')):i+=1
-   out.append(form('quote','quote-form'));continue
+   out.append(QUIZ_SLOT);continue
   if l=='Поля расширенной формы:':
+   # Подробное ТЗ целиком собирает квиз выше; вторая длинная форма его дублировала.
    while i<len(lines) and (re.match(r'^\d+\.',lines[i]) or lines[i].startswith('Кнопка:')):i+=1
-   out.append(form('brief','brief-form'));continue
+   continue
   if l.startswith('Поля формы:'):
    out.append(form('tender','request'));i+=1 if i<len(lines) and lines[i].startswith('Кнопка:') else 0;continue
   if l=='Карточки:' and path=='/about/team/':
@@ -267,14 +303,15 @@ def header(path):
  bar=''
  # Телефон лежит внутри <nav>: на десктопе он справа, на узком экране попадает в раскрытое меню.
  contact='<div class="header-contact"><a href="tel:+78006004626">8 800 600-46-26</a><a href="/raschet/">Рассчитать ангар'+icon('external')+'</a></div>'
- theme='<button class="theme-toggle" type="button" aria-label="Переключить тему" title="Переключить тему">'+icon('sun').replace('class="icon"','class="icon icon-sun"')+icon('moon').replace('class="icon"','class="icon icon-moon"')+'</button>'
+ # Вместо переключателя темы — быстрый вызов. Тёмная тема работает по системной настройке.
+ call='<a class="header-call" href="tel:+78006004626" data-goal="call_button">'+icon('phone')+'<span>Позвонить</span></a>'
  burger='<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation" aria-label="Открыть меню"><span></span><span></span></button>'
- return '<a class="skip" href="#main">Перейти к содержанию</a>'+bar+'<header class="header"><div class="shell header-inner"><a class="brand" href="/" aria-label="Тентовые конструкции — главная">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><nav id="navigation" class="nav" aria-label="Главная навигация"><div class="nav-links">'+navitem('/angary/',['/angary/']+list(labels.keys())[2:8]+['/angary/gotovye/'])+navitem('/technology/',['/technology/','/proektirovanie/','/montazh/','/dostavka/','/process/'])+navitem('/projects/')+navitem('/production/')+navitem('/about/',['/about/','/career/','/materials/','/gallery/','/tendery/'])+navitem('/contacts/')+'</div>'+contact+'</nav><div class="header-actions">'+theme+burger+'</div></div></header>'
+ return '<a class="skip" href="#main">Перейти к содержанию</a>'+bar+'<header class="header"><div class="shell header-inner"><a class="brand" href="/" aria-label="Тентовые конструкции — главная">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><nav id="navigation" class="nav" aria-label="Главная навигация"><div class="nav-links">'+navitem('/angary/',['/angary/']+list(labels.keys())[2:8]+['/angary/gotovye/'])+navitem('/technology/',['/technology/','/proektirovanie/','/montazh/','/dostavka/','/process/'])+navitem('/projects/')+navitem('/production/')+navitem('/about/',['/about/','/career/','/materials/','/gallery/','/tendery/'])+navitem('/contacts/')+'</div>'+contact+'</nav><div class="header-actions">'+call+burger+'</div></div></header>'
 def mobile_cta():
  # Постоянный доступ к звонку и расчёту на телефоне: в шапке для них нет места.
  return '<div class="mobile-cta"><a class="cta-call" href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a class="cta-quote" href="/raschet/">Рассчитать ангар</a></div>'
 def footer():
- return '<footer class="footer"><div class="shell footer-grid"><div><a class="brand" href="/">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><p>Проектируем, производим и монтируем каркасные ангары. Доставка по России.</p></div><div class="footer-links">'+''.join(f'<a href="{u}">{e(labels[u])}</a>' for u in ['/angary/','/technology/','/projects/','/production/','/tendery/','/materials/','/career/','/gallery/'])+'</div><div class="footer-contact"><a href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a href="mailto:t-karkas@yandex.ru">t-karkas@yandex.ru</a><div class="social"><a class="brand-link" href="'+MAX_URL+'" target="_blank" rel="noopener"><img src="/img/logos/max.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Написать нам в MAX'+icon('external')+'</a></div></div></div><div class="shell footer-bottom"><span>© '+str(YEAR)+' Тентовые конструкции</span></div></footer>'
+ return '<footer class="footer"><div class="shell footer-grid"><div><a class="brand" href="/">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><p>Проектируем, производим и монтируем каркасные ангары. Доставка по России.</p></div><div class="footer-links">'+''.join(f'<a href="{u}">{e(labels[u])}</a>' for u in ['/angary/','/technology/','/projects/','/production/','/tendery/','/materials/','/career/','/gallery/'])+'</div><div class="footer-contact"><a href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a href="mailto:t-karkas@yandex.ru">t-karkas@yandex.ru</a><div class="social"><a class="brand-link" href="'+MAX_URL+'" target="_blank" rel="noopener"><img src="/img/logos/max.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Написать нам в MAX'+icon('external')+'</a></div></div></div><div class="shell footer-bottom"><span>© '+str(YEAR)+' Тентовые конструкции</span><a class="footer-author" href="https://2vlad.ru" target="_blank" rel="noopener" data-goal="author_click"><span>Сделано в</span><img src="/img/logos/2vlad.svg" alt="2VLAD" width="71" height="20" loading="lazy" decoding="async"></a></div></footer>'
 
 from img_tag import best as img_best
 
@@ -286,6 +323,7 @@ def stamp(path):
  return hashlib.md5((ROOT/path).read_bytes()).hexdigest()[:8]
 CSS_V=stamp('css/site.css')
 JS_V=stamp('js/main.js')
+QUIZ_V=stamp('js/quiz.js')
 
 def share_image():
  # Превью для мессенджеров: снимок цеха шириной 1200px, чтобы карточка не обрезалась.
@@ -319,7 +357,7 @@ def head(p):
   '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
   '<link rel="preload" href="/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>',
   '<link rel="preload" href="/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>',
-  f'<link rel="stylesheet" href="/css/site.css?v={CSS_V}">',f'<script defer src="/js/main.js?v={JS_V}"></script>',THEME_BOOT]+([YM_HEAD] if PUBLISH else [])+[jsonld(p)]
+  f'<link rel="stylesheet" href="/css/site.css?v={CSS_V}">',f'<script defer src="/js/main.js?v={JS_V}"></script>',(f'<script defer src="/js/quiz.js?v={QUIZ_V}"></script>' if p['url']=='/raschet/' else ''),YM_SCRIPT_ID,THEME_BOOT]+([YM_HEAD] if PUBLISH else [])+[jsonld(p)]
  return ''.join(tags)
 
 def fab():
@@ -330,8 +368,11 @@ def fab():
  return ('<div class="fab" data-fab><div class="fab-menu" id="fab-menu" role="group" aria-label="Написать нам">'
   +link(TG_URL,'telegram','Telegram','Написать в чат')+link(MAX_URL,'max','MAX','Написать в чат')
   +'</div><button class="fab-toggle" type="button" aria-expanded="false" aria-controls="fab-menu" aria-label="Написать нам"><span class="fab-tip">Написать нам</span>'+chat+close+'</button></div>')
+QUIZ_SLOT='<!--quiz-slot-->'
 def layout(p,body):
  body=apply_all_photos(p,body)
+ if QUIZ_SLOT in body:
+  body=body.replace(QUIZ_SLOT,render_quiz('quote-form',FORM_KEY,FORM_ENDPOINT,UTM_FIELDS,icon('arrow')))
  return '<!DOCTYPE html>\n<html lang="ru"><head>'+head(p)+'</head><body class="'+('home-page' if p['url']=='/' else 'inner-page')+'">'+(YM_BODY if PUBLISH else '')+header(p['url'])+'<main id="main">'+body+'</main>'+footer()+mobile_cta()+fab()+'</body></html>'
 def write(url,content):
  dest=ROOT/url.strip('/')/'index.html';dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(rebase(apply_identity(content)))
@@ -349,7 +390,7 @@ def build_page(p):
  iswide=path in ['/about/team/','/gallery/','/materials/','/raschet/']
  if home:
   right='<aside class="hero-panel"><div class="panel-label">'+icon('ruler')+'Ваш будущий ангар</div><h2>Начнём<br>с вашей задачи</h2><p>Оставьте контакт и несколько слов о задаче. Уточним параметры и состав работ.</p>'+form('short','hero-form')+'<a class="brief-link" href="/raschet/#brief">Есть готовое ТЗ? Передайте параметры ↗</a></aside>'
-  body='<section class="hero home-hero"><div class="shell hero-grid"><div class="hero-copy"><p class="eyebrow">'+e(eyebrow)+'</p><h1>'+e(p['h1'])+'</h1><div class="hero-description">'+herohtml+'</div></div>'+right+'</div></section><div class="shell">'+facts+'</div>'
+  body='<section class="hero home-hero"><div class="shell hero-grid"><div class="hero-copy"><p class="eyebrow">'+e(eyebrow)+'</p><h1>'+e(p['h1'])+'</h1><div class="hero-description">'+herohtml+'<a class="button button-call" href="tel:+78006004626" data-goal="call_button">'+icon('phone')+'Позвонить</a>'+'</div></div>'+right+'</div></section><div class="shell">'+facts+'</div>'
  else:
   body='<section class="hero inner-hero"><div class="shell">'+breadcrumb+'<p class="eyebrow">'+e(eyebrow)+'</p><h1>'+e(p['h1'])+'</h1><div class="hero-description '+('wide-hero' if iswide else '')+'">'+herohtml+'</div></div></section>'
  if path=='/projects/':
