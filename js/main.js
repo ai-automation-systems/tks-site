@@ -132,10 +132,69 @@ if (params.has('ready') || params.get('type') === 'ready') document.querySelecto
  el.textContent = 'Запрос по готовому ангару' + (params.has('ready') ? ' · ' + params.get('ready') : '');
 });
 
+/* ── Телефон: +7 уже стоит перед полем, номер набирают с 9 или 4 ── */
+/* Защита от ботов: они подставляют номер с 7, 8 или с произвольной цифры — такой набор
+   не принимается. Человеку маска сразу показывает формат (930) 918-30-75. */
+const PHONE_START = /^[94]/;
+const phoneDigits = value => {
+ let d = String(value).replace(/\D/g, '');
+ // Номер вставили или подставил браузер целиком (+7…, 8…): код страны уже стоит перед полем.
+ if (d.length === 11 && /^[78]/.test(d)) d = d.slice(1);
+ return d.slice(0, 10);
+};
+const phoneFormat = d => !d ? '' : '(' + d.slice(0, 3)
+ + (d.length > 3 ? ') ' + d.slice(3, 6) : '')
+ + (d.length > 6 ? '-' + d.slice(6, 8) : '')
+ + (d.length > 8 ? '-' + d.slice(8, 10) : '');
+const phoneHint = (input, text) => {
+ const box = input.closest('label') || input.parentElement;
+ let hint = box.querySelector('.phone-hint');
+ if (!hint) {
+  hint = document.createElement('small');
+  hint.className = 'phone-hint';
+  hint.setAttribute('role', 'alert');
+  box.append(hint);
+ }
+ hint.textContent = text || '';
+ hint.hidden = !text;
+};
+window.phoneValid = input => { const d = phoneDigits(input.value); return d.length === 10 && PHONE_START.test(d); };
+window.phoneFull = input => '+7 ' + phoneFormat(phoneDigits(input.value));
+window.checkPhone = input => {
+ if (phoneValid(input)) return true;
+ const empty = !phoneDigits(input.value);
+ phoneHint(input, empty ? 'Укажите номер телефона' : 'Введите номер полностью: 10 цифр после +7');
+ input.focus();
+ return false;
+};
+document.querySelectorAll('input[data-phone]').forEach(input => {
+ let last = '';
+ input.addEventListener('input', () => {
+  const raw = input.value;
+  const caret = input.selectionStart ?? raw.length;
+  let digits = raw.replace(/\D/g, '');
+  const shift = digits.length === 11 && /^[78]/.test(digits) ? 1 : 0;
+  let d = phoneDigits(raw);
+  if (d && !PHONE_START.test(d)) {
+   // Первая цифра не 9 и не 4 — возвращаем прежний номер и подсказываем формат.
+   phoneHint(input, 'Номер набирается с 9 или 4, +7 уже указан');
+   d = last;
+  } else phoneHint(input, '');
+  last = d;
+  const value = phoneFormat(d);
+  input.value = value;
+  // Курсор остаётся после той же по счёту цифры, а не прыгает в конец.
+  let need = Math.max(0, raw.slice(0, caret).replace(/\D/g, '').length - shift), pos = 0;
+  while (pos < value.length && need > 0) { if (/\d/.test(value[pos])) need--; pos++; }
+  if (caret >= raw.length) pos = value.length;
+  try { input.setSelectionRange(pos, pos); } catch (e) {}
+ });
+});
+
 /* ── Формы ─────────────────────────────────────────────────── */
-document.querySelectorAll('form').forEach(form => {
+// Пошаговый расчёт отправляет js/quiz.js — второй обработчик слал бы заявку дважды.
+document.querySelectorAll('form:not([data-quiz])').forEach(form => {
  const phone = form.querySelector('[name="phone"]');
- phone?.addEventListener('input', () => phone.setCustomValidity(''));
  // Колесо мыши над числовым полем меняло значение при обычной прокрутке страницы.
  form.querySelectorAll('input[type="number"]').forEach(input =>
   input.addEventListener('wheel', () => { if (document.activeElement === input) input.blur(); }, { passive: true }));
@@ -146,11 +205,9 @@ document.querySelectorAll('form').forEach(form => {
  });
  form.addEventListener('submit', async event => {
   event.preventDefault();
-  if (phone && phone.value.replace(/\D/g, '').length < 7) {
-   phone.setCustomValidity('Укажите номер телефона');
-   phone.reportValidity();
-   phone.setCustomValidity('');
-   return;
+  // У форм novalidate: обязательные поля и формат почты проверяем сами, по порядку.
+  for (const el of form.querySelectorAll('input:not([type=hidden]),select,textarea')) {
+   if (el === phone ? !checkPhone(el) : !el.checkValidity() && !el.reportValidity()) return;
   }
   const status = form.querySelector('.form-status');
   const button = form.querySelector('[type=submit]');
@@ -159,6 +216,7 @@ document.querySelectorAll('form').forEach(form => {
   status.textContent = 'Отправляем…';
   try {
    await sendForm(form);
+   try { if (window.ym && window.YM_ID) ym(window.YM_ID, 'reachGoal', 'form_submit'); } catch (e) {}
    form.querySelector('.form-grid').hidden = true;
    form.querySelector('.form-bottom').hidden = true;
    status.textContent = 'Заявка отправлена. Свяжемся с вами в течение рабочего дня.';
@@ -281,9 +339,6 @@ if (photoLinks.length) {
   if (href.startsWith('tel:')) goal('call_click');
   else if (/^\/contacts\/?$/.test(href)) goal('contacts_view');
  }, { capture: true });
- // Заявка обычной формы (квиз шлёт свою цель сам).
- document.querySelectorAll('form:not([data-quiz])').forEach(f =>
-  f.addEventListener('submit', () => goal('form_submit')));
 })();
 
 /* ── Метки источника ───────────────────────────────────────── */
@@ -307,35 +362,52 @@ if (photoLinks.length) {
  });
 })();
 
-/* Письмо должно читаться человеком, поэтому поля уезжают с русскими подписями,
-   а не как name="utm_source". FormSubmit подставляет ключи JSON прямо в письмо. */
+/* Письмо должно читаться человеком: сверху контакты, затем задача и ответы на вопросы
+   расчёта — каждый отдельной строкой таблицы, внизу откуда пришла заявка.
+   FormSubmit подставляет ключи JSON прямо в письмо, поэтому ключи — русские подписи. */
 const FIELD_LABELS = {
  name: 'Имя', phone: 'Телефон', email: 'Почта', company: 'Компания',
  purpose: 'Назначение ангара', location: 'Место строительства', comment: 'Комментарий',
- tender: 'Закупка', messenger: 'Удобен мессенджер', answers: 'Ответы на вопросы',
+ tender: 'Закупка', messenger: 'Расчёт прислать в мессенджер',
  page: 'Страница заявки', referrer: 'Источник перехода',
- utm_source: 'Источник', utm_medium: 'Канал', utm_campaign: 'Кампания',
- utm_content: 'Объявление', utm_term: 'Запрос'
+ utm_source: 'Метка: источник', utm_medium: 'Метка: канал', utm_campaign: 'Метка: кампания',
+ utm_content: 'Метка: объявление', utm_term: 'Метка: запрос'
 };
-const SERVICE_FIELDS = ['_subject', '_template', '_captcha', '_honey'];
-const SKIP_FIELDS = ['consent', '_honey'];
+const TECH_FIELDS = ['page', 'referrer', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+// Подпись поля берётся из самой формы: так в письме те же слова, что видел человек.
+function labelOf(el) {
+ if (FIELD_LABELS[el.name]) return FIELD_LABELS[el.name];
+ const legend = el.closest('fieldset')?.querySelector('legend');
+ if (legend) return legend.textContent.trim();
+ const caption = el.closest('label')?.querySelector(':scope > span');
+ return caption ? caption.textContent.replace('*', '').trim() : el.name;
+}
 function buildPayload(form) {
- const data = {};
- new FormData(form).forEach((value, key) => {
-  if (typeof value !== 'string' || !value.trim()) return;
-  if (SKIP_FIELDS.includes(key)) return;
-  if (SERVICE_FIELDS.includes(key)) { data[key] = value; return; }
-  // Ответы квиза уже собраны в читаемый блок «Ответы на вопросы»,
-  // поэтому сырые поля шагов (q0_purpose и подобные) в письмо не дублируем.
-  if (/^q\d+_/.test(key)) return;
-  const label = FIELD_LABELS[key] || key;
-  data[label] = data[label] ? data[label] + ', ' + value : value;
- });
- ['_subject', '_template', '_captcha'].forEach(k => {
-  const el = form.querySelector(`[name="${k}"]`);
-  if (el) data[k] = el.value;
- });
- return data;
+ const main = {}, tech = {};
+ for (const el of form.elements) {
+  const key = el.name;
+  if (!key || el.disabled || key.startsWith('_') || key === 'consent') continue;
+  if (/^(checkbox|radio)$/.test(el.type) && !el.checked) continue;
+  // Шаги расчёта уходят готовым списком «вопрос — ответ» из quiz.js, сырые поля не дублируем.
+  if (/^q\d+_/.test(key)) continue;
+  let value = (el.value || '').trim();
+  if (!value) continue;
+  if (key === 'phone') value = phoneFull(el);
+  if (key === 'page') value = location.origin + value;
+  const box = TECH_FIELDS.includes(key) ? tech : main;
+  const label = labelOf(el);
+  box[label] = box[label] ? box[label] + ', ' + value : value;
+ }
+ // Имя и телефон в теме письма — заявку видно прямо в списке входящих.
+ const subject = form.querySelector('[name="_subject"]')?.value || 'Заявка с сайта t-karkas.ru';
+ const who = [main['Имя'], main['Телефон']].filter(Boolean).join(', ');
+ const data = { _subject: subject + (who ? ': ' + who : ''), _template: 'table', _captcha: 'false' };
+ // «Ответить» в почте сразу пишет клиенту, если он оставил адрес.
+ const email = form.querySelector('[name="email"]')?.value.trim();
+ if (email) data._replyto = email;
+ Object.assign(data, main);
+ (form.quizAnswers || []).forEach(([question, answer]) => { data[question] = answer; });
+ return Object.assign(data, tech);
 }
 // Сервис может на мгновение отказать при всплеске обращений — делаем одну
 // повторную попытку, терять заявку из-за секундного сбоя нельзя.
@@ -344,6 +416,9 @@ window.sendForm = async function (form) {
  // бот не должен понять, что его отбраковали, а квота сервиса не тратится.
  const honey = form.querySelector('[name="_honey"]');
  if (honey && honey.checked) return { success: 'true', skipped: true };
+ // Бот, отправивший форму в обход маски, не проходит проверку номера.
+ const phone = form.querySelector('[data-phone]');
+ if (phone && !phoneValid(phone)) throw new Error('phone');
  const body = JSON.stringify(buildPayload(form));
  let last;
  for (let attempt = 0; attempt < 2; attempt++) {
@@ -362,4 +437,26 @@ window.sendForm = async function (form) {
   }
  }
  throw last;
-}
+};
+
+/* ── Уведомление о cookie ──────────────────────────────────── */
+/* Ненавязчивая карточка в углу: не закрывает страницу и не мешает читать.
+   После «Понятно» больше не показывается на этом устройстве. */
+(function () {
+ const KEY = 'cookie-note';
+ try { if (localStorage.getItem(KEY)) return; } catch (e) {}
+ const note = document.createElement('div');
+ note.className = 'cookie-note';
+ note.setAttribute('role', 'region');
+ note.setAttribute('aria-label', 'Уведомление о cookie');
+ note.innerHTML = '<p>Мы используем cookie и Яндекс Метрику. '
+  + 'Подробнее — в <a href="/privacy/#cookies">политике конфиденциальности</a>.</p>'
+  + '<button type="button">Понятно</button>';
+ document.body.append(note);
+ setTimeout(() => note.classList.add('shown'), 900);
+ note.querySelector('button').addEventListener('click', () => {
+  try { localStorage.setItem(KEY, '1'); } catch (e) {}
+  note.classList.remove('shown');
+  setTimeout(() => note.remove(), 400);
+ });
+})();

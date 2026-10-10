@@ -73,6 +73,12 @@ def _step(step, idx, total):
             f'{head}{body}</section>')
 
 
+def _consent(text):
+    """Слова о политике ведут на саму политику — в новой вкладке, чтобы не потерять ответы."""
+    words = 'политике конфиденциальности'
+    return e(text).replace(words, f'<a href="/privacy/" target="_blank">{words}</a>', 1)
+
+
 def _contacts(idx, total):
     c = SPEC['contacts']
     rows = []
@@ -80,8 +86,10 @@ def _contacts(idx, total):
         req = ' required' if f.get('required') else ''
         star = ' <em>*</em>' if f.get('required') else ''
         if f['name'] == 'phone':
-            ctrl = (f'<span class="quiz-phone"><span class="quiz-phone-prefix">{e(f["prefix"])}</span>'
-                    f'<input type="tel" name="phone" inputmode="tel" autocomplete="tel"{req}></span>')
+            # Код страны уже стоит перед полем; маску и проверку «с 9 или 4» ведёт main.js.
+            ctrl = (f'<span class="phone-field"><span class="phone-prefix" aria-hidden="true">{e(f["prefix"])}</span>'
+                    f'<input type="tel" name="phone" inputmode="numeric" autocomplete="tel" '
+                    f'placeholder="(900) 000-00-00" data-phone{req}></span>')
         else:
             t = 'email' if f['name'] == 'email' else 'text'
             ac = {'name': 'name', 'email': 'email'}.get(f['name'], '')
@@ -95,7 +103,7 @@ def _contacts(idx, total):
             f'<label class="quiz-check"><input type="checkbox" name="messenger" value="Да">'
             f'<span>{e(c["messenger"])}</span></label>'
             f'<label class="quiz-check"><input type="checkbox" name="consent" value="Да" required>'
-            f'<span>{e(c["consent"])}</span></label>'
+            f'<span>{_consent(c["consent"])}</span></label>'
             f'</section>')
 
 
@@ -115,8 +123,7 @@ def quiz(uid='quiz', form_key='', endpoint='', utm_fields=(), arrow=''):
               '<input type="hidden" name="_captcha" value="false">'
               '<input type="checkbox" name="_honey" style="display:none" tabindex="-1" aria-hidden="true" autocomplete="off">'
               + ''.join(f'<input type="hidden" name="{n}" data-utm="{n}">' for n in utm_fields)
-              + '<input type="hidden" name="page" data-page>'
-              '<input type="hidden" name="answers" data-answers>')
+              + '<input type="hidden" name="page" data-page>')
     body = ''.join(_step(s, n, total) for n, s in enumerate(steps)) + _contacts(len(steps), total)
     nav = (f'<div class="quiz-nav" hidden>'
            f'<div class="quiz-progress"><span class="quiz-progress-label">{e(SPEC["ui"]["progressLabel"])} '

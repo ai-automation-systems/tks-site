@@ -51,7 +51,7 @@ def rebase(t):
  t=re.sub(r'srcset="([^"]*)"',lambda m:'srcset="'+','.join((BASE+x.strip() if x.strip().startswith('/') else x) for x in m.group(1).split(','))+'"',t)
  return t
 # Порядок важен: токены объявляются до компонентов.
-CSS_PARTS=['tokens.css','style.css','home-photo.css','all-photos.css','brand.css','fab.css','quiz.css','touch.css']
+CSS_PARTS=['tokens.css','style.css','home-photo.css','all-photos.css','brand.css','fab.css','quiz.css','touch.css','privacy.css']
 def e(s): return html.escape(str(s),quote=True)
 def val(s,k,default=''):
  m=re.search(r'^'+re.escape(k)+r': (.*)$',s,re.M);return m.group(1).strip() if m else default
@@ -123,10 +123,15 @@ AUTOFILL={'name':'name','phone':'tel','email':'email','company':'organization','
 CITIES=['Воронеж','Тамбов','Иркутск','Иркутская область','Магаданская область','Хабаровский край',
         'Забайкальский край','Камчатский край','Красноярский край','Республика Бурятия',
         'Республика Саха (Якутия)','Чукотский АО']
+PHONE=('<span class="phone-field"><span class="phone-prefix" aria-hidden="true">+7</span>'
+ '<input {attrs} type="tel" inputmode="numeric" autocomplete="tel" placeholder="(900) 000-00-00" data-phone></span>')
+PRIVACY_URL='/privacy/'
 def field(label,name,type='text',required=False,options=None,wide=False,datalist=None):
  attrs=f'name="{name}" id="{{uid}}-{name}"'+(' required' if required else '')
  lab=f'<label class="field {"wide" if wide else ""}"><span>{e(label)}{(" <em>*</em>" if required else "")}</span>'
  if options: ctrl=f'<select {attrs}>'+''.join(f'<option value="{e(v)}">{e(v)}</option>' for v in options)+'</select>'
+ # Код страны уже стоит перед полем: человек набирает номер с 9 или 4, маску и проверку ведёт main.js.
+ elif name=='phone': ctrl=PHONE.replace('{attrs}',attrs)
  elif type=='textarea': ctrl=f'<textarea {attrs} rows="3"></textarea>'
  else:
   extra=(' min="0" step="any" inputmode="decimal"' if type=='number' else '')
@@ -164,7 +169,7 @@ def form(mode='short',uid='request-form',button=None):
   '<input type="checkbox" name="_honey" style="display:none" tabindex="-1" aria-hidden="true" autocomplete="off">'
   +''.join(f'<input type="hidden" name="{n}" data-utm="{n}">' for n in UTM_FIELDS)
   +'<input type="hidden" name="page" data-page>')
- note=''
+ note=f'<p class="form-consent">Нажимая кнопку, вы соглашаетесь с <a href="{PRIVACY_URL}" target="_blank">политикой обработки персональных данных</a>.</p>'
  return (f'<form class="form form-{mode}" id="{uid}" action="{FORM_ENDPOINT}" method="post" novalidate>'
   +hidden+'<div class="form-grid">'+fs.replace('{uid}',uid)
   +f'</div><p class="form-context" hidden></p><div class="form-bottom">'
@@ -313,7 +318,7 @@ def mobile_cta():
  # Постоянный доступ к звонку и расчёту на телефоне: в шапке для них нет места.
  return '<div class="mobile-cta"><a class="cta-call" href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a class="cta-quote" href="/raschet/">Рассчитать ангар</a></div>'
 def footer():
- return '<footer class="footer"><div class="shell footer-grid"><div><a class="brand" href="/">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><p>Проектируем, производим и монтируем каркасные ангары. Доставка по России.</p></div><div class="footer-links">'+''.join(f'<a href="{u}">{e(labels[u])}</a>' for u in ['/angary/','/technology/','/projects/','/production/','/tendery/','/materials/','/career/','/gallery/'])+'</div><div class="footer-contact"><a href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a href="mailto:t-karkas@yandex.ru">t-karkas@yandex.ru</a><div class="social"><a class="brand-link" href="'+MAX_URL+'" target="_blank" rel="noopener"><img src="/img/logos/max.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Написать нам в MAX'+icon('external')+'</a></div></div></div><div class="shell footer-bottom"><span>© '+str(YEAR)+' Тентовые конструкции</span><a class="footer-author" href="https://2vlad.ru" target="_blank" rel="noopener" data-goal="author_click"><span>Сделано в</span><span class="footer-author-mark" aria-hidden="true"></span><span class="sr-only">2VLAD</span></a></div></footer>'
+ return '<footer class="footer"><div class="shell footer-grid"><div><a class="brand" href="/">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><p>Проектируем, производим и монтируем каркасные ангары. Доставка по России.</p></div><div class="footer-links">'+''.join(f'<a href="{u}">{e(labels[u])}</a>' for u in ['/angary/','/technology/','/projects/','/production/','/tendery/','/materials/','/career/','/gallery/'])+'</div><div class="footer-contact"><a href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a href="mailto:t-karkas@yandex.ru">t-karkas@yandex.ru</a><div class="social"><a class="brand-link" href="'+MAX_URL+'" target="_blank" rel="noopener"><img src="/img/logos/max.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Написать нам в MAX'+icon('external')+'</a></div></div></div><div class="shell footer-bottom"><span>© '+str(YEAR)+' Тентовые конструкции</span><a href="'+PRIVACY_URL+'">Политика конфиденциальности</a><a class="footer-author" href="https://2vlad.ru" target="_blank" rel="noopener" data-goal="author_click"><span>Сделано в</span><span class="footer-author-mark" aria-hidden="true"></span><span class="sr-only">2VLAD</span></a></div></footer>'
 
 from img_tag import best as img_best
 
@@ -441,7 +446,9 @@ for id,c in cases.items():
 
 notfound='<section class="hero inner-hero"><div class="shell"><p class="eyebrow">Ошибка 404</p><h1>Страница не найдена</h1><div class="hero-description"><p>Возможно, ссылка устарела или адрес набран с ошибкой. Вернитесь на главную или выберите раздел в меню.</p><a class="button" href="/">На главную'+icon('arrow')+'</a></div></div></section>'
 (ROOT/'404.html').write_text(typography(rebase(apply_identity(layout(dict(url='/404.html',title='Страница не найдена | Тентовые конструкции'),notfound)).replace('<meta name="robots" content="index,follow">','<meta name="robots" content="noindex,nofollow">').replace('<link rel="canonical" href="'+SITE+'/404.html">',''))))
-all_urls=[p['url'] for p in pages]+[c['url'] for id,c in cases.items() if id!='P04']
+import privacy
+write(PRIVACY_URL,layout(dict(url=PRIVACY_URL,title=privacy.TITLE,description=privacy.DESCRIPTION,h1=privacy.H1),privacy.body()))
+all_urls=[p['url'] for p in pages]+[c['url'] for id,c in cases.items() if id!='P04']+[PRIVACY_URL]
 if PUBLISH:
  (ROOT/'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {SITE}/sitemap.xml\n')
  today=datetime.date.today().isoformat()

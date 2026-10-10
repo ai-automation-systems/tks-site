@@ -60,10 +60,6 @@
 .quiz-counter{align-self:flex-end;font-size:var(--fs-2xs);color:var(--text-3);font-variant-numeric:tabular-nums}
 .quiz-sub{font-size:var(--fs-sm);color:var(--text-2);margin-bottom:var(--sp-5);max-width:52ch}
 .quiz-contact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-4);margin-bottom:var(--sp-5)}
-.quiz-phone{display:flex;align-items:stretch;border:1px solid var(--border-field);border-radius:var(--r-sm);overflow:hidden;background:var(--surface)}
-.quiz-phone:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
-.quiz-phone-prefix{display:grid;place-items:center;padding-inline:var(--sp-4);background:var(--surface-2);border-right:1px solid var(--border);font-size:var(--fs-sm);font-weight:var(--fw-semi);color:var(--text-2)}
-.quiz-phone input{border:0;border-radius:0;box-shadow:none!important}
 .quiz-check{display:flex;align-items:flex-start;gap:var(--sp-3);font-size:var(--fs-xs);color:var(--text-2);line-height:1.5;cursor:pointer;margin-bottom:var(--sp-3)}
 .quiz-check input{width:20px;height:20px;accent-color:var(--accent);flex-shrink:0;margin-top:1px}
 

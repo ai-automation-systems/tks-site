@@ -85,9 +85,9 @@
     });
     value = picked.join(', ');
    }
-   lines.push(title + '\n— ' + (value || 'не указано'));
+   lines.push([title, value || 'не указано']);
   });
-  return lines.join('\n\n');
+  return lines;
  }
 
  function advance() {
@@ -110,15 +110,13 @@
   const name = form.querySelector('[name=name]');
   const consent = form.querySelector('[name=consent]');
   if (!name.value.trim()) return name.reportValidity();
-  if (phone.value.replace(/\D/g, '').length < 7) {
-   phone.setCustomValidity('Укажите номер телефона');
-   phone.reportValidity();
-   phone.setCustomValidity('');
-   return;
-  }
+  if (!window.checkPhone(phone)) return;
+  const email = form.querySelector('[name=email]');
+  if (email && !email.checkValidity()) return email.reportValidity();
   if (!consent.checked) return consent.reportValidity();
 
-  form.querySelector('[data-answers]').value = collect();
+  // Каждый вопрос уходит отдельной строкой письма, см. buildPayload в main.js.
+  form.quizAnswers = collect();
   const button = form.querySelector('.quiz-next');
   button.disabled = true;
   status.hidden = false;
