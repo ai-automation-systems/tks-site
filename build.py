@@ -124,7 +124,7 @@ CITIES=['Воронеж','Тамбов','Иркутск','Иркутская о�
         'Забайкальский край','Камчатский край','Красноярский край','Республика Бурятия',
         'Республика Саха (Якутия)','Чукотский АО']
 PHONE=('<span class="phone-field"><span class="phone-prefix" aria-hidden="true">+7</span>'
- '<input {attrs} type="tel" inputmode="numeric" autocomplete="tel" placeholder="(900) 000-00-00" data-phone></span>')
+ '<input {attrs} type="tel" inputmode="numeric" autocomplete="off" placeholder="(900) 000-00-00" data-phone></span>')
 PRIVACY_URL='/privacy/'
 def field(label,name,type='text',required=False,options=None,wide=False,datalist=None):
  attrs=f'name="{name}" id="{{uid}}-{name}"'+(' required' if required else '')

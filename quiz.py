@@ -88,7 +88,7 @@ def _contacts(idx, total):
         if f['name'] == 'phone':
             # Код страны уже стоит перед полем; маску и проверку «с 9 или 4» ведёт main.js.
             ctrl = (f'<span class="phone-field"><span class="phone-prefix" aria-hidden="true">{e(f["prefix"])}</span>'
-                    f'<input type="tel" name="phone" inputmode="numeric" autocomplete="tel" '
+                    f'<input type="tel" name="phone" inputmode="numeric" autocomplete="off" '
                     f'placeholder="(900) 000-00-00" data-phone{req}></span>')
         else:
             t = 'email' if f['name'] == 'email' else 'text'

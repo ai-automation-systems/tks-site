@@ -133,15 +133,10 @@ if (params.has('ready') || params.get('type') === 'ready') document.querySelecto
 });
 
 /* ── Телефон: +7 уже стоит перед полем, номер набирают с 9 или 4 ── */
-/* Защита от ботов: они подставляют номер с 7, 8 или с произвольной цифры — такой набор
-   не принимается. Человеку маска сразу показывает формат (930) 918-30-75. */
+/* Защита от ботов: первая цифра — только 9 или 4. Номер с 7, 8 или «+7…» не принимается
+   ни при наборе, ни при вставке. Человеку маска сразу показывает формат (930) 918-30-75. */
 const PHONE_START = /^[94]/;
-const phoneDigits = value => {
- let d = String(value).replace(/\D/g, '');
- // Номер вставили или подставил браузер целиком (+7…, 8…): код страны уже стоит перед полем.
- if (d.length === 11 && /^[78]/.test(d)) d = d.slice(1);
- return d.slice(0, 10);
-};
+const phoneDigits = value => String(value).replace(/\D/g, '').slice(0, 10);
 const phoneFormat = d => !d ? '' : '(' + d.slice(0, 3)
  + (d.length > 3 ? ') ' + d.slice(3, 6) : '')
  + (d.length > 6 ? '-' + d.slice(6, 8) : '')
@@ -172,8 +167,6 @@ document.querySelectorAll('input[data-phone]').forEach(input => {
  input.addEventListener('input', () => {
   const raw = input.value;
   const caret = input.selectionStart ?? raw.length;
-  let digits = raw.replace(/\D/g, '');
-  const shift = digits.length === 11 && /^[78]/.test(digits) ? 1 : 0;
   let d = phoneDigits(raw);
   if (d && !PHONE_START.test(d)) {
    // Первая цифра не 9 и не 4 — возвращаем прежний номер и подсказываем формат.
@@ -184,7 +177,7 @@ document.querySelectorAll('input[data-phone]').forEach(input => {
   const value = phoneFormat(d);
   input.value = value;
   // Курсор остаётся после той же по счёту цифры, а не прыгает в конец.
-  let need = Math.max(0, raw.slice(0, caret).replace(/\D/g, '').length - shift), pos = 0;
+  let need = Math.max(0, raw.slice(0, caret).replace(/\D/g, '').length), pos = 0;
   while (pos < value.length && need > 0) { if (/\d/.test(value[pos])) need--; pos++; }
   if (caret >= raw.length) pos = value.length;
   try { input.setSelectionRange(pos, pos); } catch (e) {}
