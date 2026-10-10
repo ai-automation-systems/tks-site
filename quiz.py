@@ -7,6 +7,7 @@
 """
 from pathlib import Path
 import json, html
+from img_tag import picture
 
 ROOT = Path(__file__).resolve().parent
 SPEC = json.loads((ROOT/'content/quiz.json').read_text())
@@ -103,8 +104,7 @@ def quiz(uid='quiz', form_key='', endpoint='', utm_fields=(), arrow=''):
     steps = SPEC['steps']
     total = len(steps) + 1
     intro = (f'<section class="quiz-intro" data-step="intro">'
-             f'<div class="quiz-intro-media"><img src="{INTRO_PHOTO}" alt="" width="1800" height="1350" '
-             f'loading="eager" fetchpriority="high" decoding="async"></div>'
+             '<div class="quiz-intro-media">'+picture(INTRO_PHOTO,'',sizes='hero',eager=True)+'</div>'
              f'<div class="quiz-intro-body"><p class="quiz-badge">{e(i["badge"])}</p>'
              f'<h2>{e(i["title"])}</h2><ul class="quiz-bullets">'
              + ''.join(f'<li>{e(b)}</li>' for b in i['bullets'])

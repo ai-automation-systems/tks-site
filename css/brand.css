@@ -13,10 +13,10 @@
 .legal-numbers{display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-5)}
 .footer-legal+.footer-bottom{margin-top:var(--sp-5)}
 
-/* Карточки направлений на главной: фото 4:3 во всю ширину карточки, прямые углы. */
-.home-page .service-card{padding:0 var(--sp-6) var(--sp-5);overflow:hidden;border-radius:0;min-height:0}
+/* Карточки направлений на главной: рамка 4:3 во всю ширину карточки, снимок целиком, скругление как у всех карточек. */
+.home-page .service-card{padding:0 var(--sp-6) var(--sp-5);overflow:hidden;min-height:0}
 .service-photo{display:block;margin:0 calc(var(--sp-6) * -1) var(--sp-5);aspect-ratio:4/3;overflow:hidden;background:var(--surface-3);border-bottom:1px solid var(--border)}
-.service-photo img{display:block;width:100%;height:100%;object-fit:cover;transition:transform var(--dur-4) var(--ease)}
+.service-photo img{display:block;width:100%;height:100%;object-fit:contain;transition:transform var(--dur-4) var(--ease)}
 .service-card:hover .service-photo img{transform:scale(1.04)}
 
 @media(max-width:1023px){

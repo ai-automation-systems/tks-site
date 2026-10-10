@@ -5,7 +5,7 @@
 /* ── Стартовый экран ───────────────────────────────────────── */
 .quiz-intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);align-items:stretch}
 .quiz-intro-media{position:relative;min-height:100%;background:var(--surface-3)}
-.quiz-intro-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.quiz-intro-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
 .quiz-intro-body{padding:clamp(var(--sp-5),3vw,var(--sp-8))}
 .quiz-badge{display:inline-flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-2xs);font-weight:var(--fw-semi);letter-spacing:var(--track-wide);text-transform:uppercase;color:var(--accent);background:var(--accent-soft);border-radius:var(--r-full);padding:var(--sp-2) var(--sp-4);margin:0 0 var(--sp-5)}
 .quiz-intro-body h2{font-size:var(--fs-xl);margin-bottom:var(--sp-5);max-width:22ch}
@@ -46,7 +46,7 @@
 .quiz-option-card{flex-direction:column;align-items:stretch;gap:0;padding:0;overflow:hidden;position:relative}
 .quiz-option-card input{position:absolute;top:var(--sp-3);right:var(--sp-3);z-index:1}
 .quiz-card-media{display:block;aspect-ratio:4/3;background:var(--surface-2);overflow:hidden}
-.quiz-card-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform var(--dur-4) var(--ease)}
+.quiz-card-media img{width:100%;height:100%;object-fit:contain;display:block;transition:transform var(--dur-4) var(--ease)}
 .quiz-option-card:hover .quiz-card-media img{transform:scale(1.04)}
 .quiz-option-card .quiz-option-label{padding:var(--sp-3) var(--sp-4);font-size:var(--fs-xs);line-height:1.35}
 

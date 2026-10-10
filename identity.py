@@ -16,4 +16,7 @@ def apply_identity(html):
  html=re.sub(r'(?<![">])на (t-karkas@yandex\.ru)',
              r'на <a href="mailto:\1">\1</a>', html)
  html=html.replace('<div class="shell footer-bottom">',LEGAL+'<div class="shell footer-bottom">')
+ # Ссылки на расчёт ведут сразу к форме: форма ниже первого экрана, а на самой странице
+ # расчёта кнопка без якоря просто перезагружала страницу и казалась неработающей.
+ html=re.sub(r'href="/raschet/(\?[^"#]*)?"',lambda m:'href="/raschet/'+(m.group(1) or '')+'#quote-form"',html)
  return html

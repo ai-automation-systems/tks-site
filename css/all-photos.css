@@ -34,7 +34,7 @@ picture{display:contents}
 .case-gallery{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:var(--sp-6)}
 .album-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-5);align-items:start}
 .image-gallery .photo-expand,.album-grid .photo-expand{aspect-ratio:4/3}
-.image-gallery .site-photo img,.album-grid .site-photo img{height:100%;object-fit:cover}
+.image-gallery .site-photo img,.album-grid .site-photo img{height:100%;object-fit:contain}
 
 /* Обложка карточки проекта — тоже в натуральную пропорцию. */
 .with-photo{padding-top:0;overflow:hidden}
@@ -42,15 +42,17 @@ picture{display:contents}
 .case-image-link img{display:block;width:100%;height:auto;transition:transform var(--dur-4) var(--ease)}
 .case-card:hover .case-image-link img{transform:scale(1.04)}
 
-/* ЕДИНАЯ ФОРМА ОБЛОЖЕК. Снимки обрезаны по центру до 4:3, чтобы карточки
-   в ряду совпадали по размеру (было выключено — обложки заканчивались на разной высоте). */
+/* ЕДИНАЯ ФОРМА ОБЛОЖЕК: рамка 4:3, снимок вписан целиком (contain), без обрезки.
+   Свободные поля закрывает размытая миниатюра того же снимка — она стоит фоном у <img>. */
 .case-image-link{aspect-ratio:4/3}
-.case-image-link img{height:100%;object-fit:cover}
+.case-image-link img{height:100%;object-fit:contain}
 .home-page .case-photo{aspect-ratio:4/3}
-.home-page .case-photo img{height:100%;object-fit:cover}
-.case-card{border-radius:0}
-.home-page .photo-case{border-radius:0}
-.illustrated-solution{border-radius:0}
+.home-page .case-photo img{height:100%;object-fit:contain}
+/* Карточки с фото скругляются как все карточки; фото у края карточки обрезается по её скруглению. */
+.illustrated-solution{overflow:hidden}
+/* Поля вокруг вписанного снимка: размытая миниатюра того же кадра, приглушённая до тона
+   поверхности, — без цветных полос и без пустых плашек. */
+.image-gallery .site-photo img,.album-grid .site-photo img,.case-image-link img,.home-page .case-photo img,.solution-photo img,.service-photo img,.quiz-intro-media img{background-color:var(--surface-3);background-blend-mode:luminosity}
 
 /* Портреты команды в источнике квадратные (299×300), круг их не обрезает. */
 .team-portrait{display:block;width:120px;height:120px;object-fit:cover;border-radius:var(--r-full);margin:0 0 var(--sp-5);background:var(--surface-3)}
@@ -58,7 +60,7 @@ picture{display:contents}
 .solution-photo{margin:calc(var(--sp-6) * -1) calc(var(--sp-6) * -1) var(--sp-5);border:0;border-radius:0;flex-shrink:0}
 .solution-photo figcaption{font-size:var(--fs-2xs);padding:var(--sp-2) var(--sp-5);background:var(--surface-3)}
 .solution-photo .photo-expand{aspect-ratio:4/3}
-.solution-photo img{height:100%;object-fit:cover}
+.solution-photo img{height:100%;object-fit:contain}
 .illustrated-solution>.icon{display:none}
 .material-photo-card{display:grid;grid-template-columns:164px minmax(0,1fr) 24px;gap:var(--sp-5);align-items:center;min-height:130px}
 .material-photo-card img{width:164px;height:auto;border-radius:var(--r-sm)}
