@@ -46,7 +46,7 @@ picture{display:contents}
 
 /* Обложка карточки проекта — тоже в натуральную пропорцию. */
 .with-photo{padding-top:0;overflow:hidden}
-.case-image-link{display:block;margin:calc(var(--sp-6) * -1) calc(var(--sp-6) * -1) var(--sp-5);flex-shrink:0;overflow:hidden;background:var(--surface-3)}
+.case-image-link{display:block;margin:0 calc(var(--sp-6) * -1) var(--sp-5);flex-shrink:0;overflow:hidden;background:var(--surface-3)}
 .case-image-link img{display:block;width:100%;height:auto;transition:transform var(--dur-4) var(--ease)}
 .case-card:hover .case-image-link img{transform:scale(1.04)}
 
@@ -60,6 +60,10 @@ picture{display:contents}
 .illustrated-solution{overflow:hidden}
 /* Поля вокруг вписанного снимка: размытая миниатюра того же кадра, приглушённая до тона
    поверхности, — без цветных полос и без пустых плашек. */
+/* Фото у верхнего края карточки: рамка снимка сама скруглена по углам карточки (радиус карточки
+   минус рамка 1px) и изолирована. Без этого Safari при увеличении снимка на наведении рисует его
+   поверх скругления карточки, и углы становятся квадратными. */
+.site-photo .photo-expand,.case-image-link,.home-page .case-photo,.service-photo,.quiz-card-media{border-radius:calc(var(--r-md) - 1px) calc(var(--r-md) - 1px) 0 0;isolation:isolate;-webkit-mask-image:-webkit-radial-gradient(white,black)}
 .image-gallery .site-photo img,.album-grid .site-photo img,.case-image-link img,.home-page .case-photo img,.solution-photo img,.service-photo img,.quiz-intro-media img{background-color:var(--surface-3);background-blend-mode:luminosity}
 
 /* Портреты команды в источнике квадратные (299×300), круг их не обрезает. */
@@ -86,7 +90,7 @@ picture{display:contents}
 .photo-dialog-close svg{width:19px;height:19px}
 .photo-dialog-stage{position:relative;display:grid;place-items:center;background:var(--surface-2);flex:1;min-height:0}
 /* max-width ставится из JS по натуральному размеру: мелкие снимки больше не растягиваются. */
-.photo-dialog-image{display:block;width:auto;max-width:100%;height:auto;max-height:100%;object-fit:contain}
+.photo-dialog-image{display:block;width:auto;max-width:100%;height:auto;max-height:100%;object-fit:contain;border-radius:var(--r-sm)}
 .photo-nav{position:absolute;top:50%;translate:0 -50%;display:grid;place-items:center;width:48px;height:48px;border:1px solid var(--border);border-radius:var(--r-full);background:var(--surface);background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--text);box-shadow:var(--shadow-2);transition:background var(--dur-2) var(--ease),color var(--dur-2) var(--ease),opacity var(--dur-2) var(--ease)}
 .photo-nav:hover{background:var(--accent);color:var(--on-accent)}
 .photo-nav svg{width:21px;height:21px}
@@ -99,6 +103,7 @@ picture{display:contents}
 @media(max-width:1199px){
  .photo-hero-grid{gap:var(--sp-6)}
  .section-full .image-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .solution-photo{margin:calc(var(--sp-5) * -1) calc(var(--sp-5) * -1) var(--sp-5)}
 }
 @media(max-width:1023px){
  .photo-hero-grid{grid-template-columns:1fr;gap:var(--sp-5)}
@@ -112,7 +117,6 @@ picture{display:contents}
  .image-gallery,.section-full .image-gallery,.case-gallery,.album-grid{grid-template-columns:1fr;gap:var(--sp-3)}
  .photo-row{flex-direction:column;align-items:stretch;gap:var(--sp-3)}
  .photo-row .site-photo,.photo-row-partial .site-photo{flex:none;width:100%}
- .case-image-link{margin-inline:calc(var(--sp-5) * -1)}
  .team-portrait{width:104px;height:104px}
  .solution-photo{margin-inline:calc(var(--sp-5) * -1)}
  .material-photo-card{grid-template-columns:96px minmax(0,1fr) 20px;gap:var(--sp-3);min-height:110px;font-size:var(--fs-sm)}

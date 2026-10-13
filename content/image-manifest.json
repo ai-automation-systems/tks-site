@@ -4908,8 +4908,8 @@
   "lqip": "data:image/webp;base64,UklGRnQAAABXRUJQVlA4IGgAAAAwBACdASoUAA8APwlurk+rpiQiMAgBcCEJaACdAB6yM4QMbfeXIhCLfqQAwFhWQ9oGkyykVZmjSvV3+V0ovoVWEQPmZOIswbkT1YQqcaDZbIe/UMj82nfWxqMgpFy68PIcIx7sAmgAAA=="
  },
  "/img/library/f2308b9b68fe71.png": {
-  "w": 405,
-  "h": 305,
+  "w": 401,
+  "h": 301,
   "variants": {
    "avif": [
     [
@@ -4917,8 +4917,8 @@
      "/img/opt/f2308b9b68fe71-400.avif"
     ],
     [
-     405,
-     "/img/opt/f2308b9b68fe71-405.avif"
+     401,
+     "/img/opt/f2308b9b68fe71-401.avif"
     ]
    ],
    "webp": [
@@ -4927,12 +4927,12 @@
      "/img/opt/f2308b9b68fe71-400.webp"
     ],
     [
-     405,
-     "/img/opt/f2308b9b68fe71-405.webp"
+     401,
+     "/img/opt/f2308b9b68fe71-401.webp"
     ]
    ]
   },
-  "lqip": "data:image/webp;base64,UklGRpQAAABXRUJQVlA4IIgAAAAQBACdASoUAA8APwlurk+rpiQiMAgBcCEJYwCsAYvgtbRtUELvw2yvqAD+6fjyHg8xVXFMeyLzxjb0n4VJZAZ/ETPymAviszTLybCAnc3FAAsevlz4ol+XBdjvCPyENKKzHkBZo+OsEXMIOA8Wfj/5gMWT9x84j87Xv1p3QtS2BduKLdFoDwAA"
+  "lqip": "data:image/webp;base64,UklGRpYAAABXRUJQVlA4IIoAAADQAwCdASoUAA8APwlurk+rpiQiMAgBcCEJYwCsABuKVhTIoh9JDAAA/un+jCYKlSECJGVpfLB0iBs9t4l60TNCHAkP6IF8LiZx5jkNh8FdEWC5QD0JT0nBdjvCPNpv60qBzyBXfEi0GzLvnOHovcmtFDPyzEkM8quCsNv7DTzwDtBduKLdFpP8AAA="
  },
  "/img/library/f25221bbb632ab.jpg": {
   "w": 4160,

@@ -16,6 +16,8 @@
 
 /* ── Шаги ──────────────────────────────────────────────────── */
 .quiz-body{padding:clamp(var(--sp-5),3vw,var(--sp-8)) clamp(var(--sp-5),3vw,var(--sp-8)) 0}
+/* Пока открыт стартовый экран, шаги скрыты — пустой отступ давал полосу под фото и квадратные углы снимка. */
+.quiz-intro:not([hidden])+.quiz-body{padding:0}
 .quiz-step{animation:quiz-in var(--dur-3) var(--ease)}
 @keyframes quiz-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .quiz-step-num{font-size:var(--fs-2xs);font-weight:var(--fw-semi);letter-spacing:var(--track-wider);text-transform:uppercase;color:var(--text-3);margin:0 0 var(--sp-3)}
