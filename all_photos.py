@@ -19,6 +19,20 @@ def grid(xs,cls='',sizes='grid-2'):
  # Подсказка sizes должна соответствовать самой широкой колонке сетки, иначе браузер
  # возьмёт слишком мелкий вариант и снимок будет мылить.
  return '<div class="image-gallery '+cls+'">'+''.join(photo(x,sizes=sizes) for x in xs)+'</div>'
+def rows(xs,cols):
+ # Ряды «по пропорциям»: у каждой рамки соотношение сторон самого снимка, ширины в ряду
+ # делятся пропорционально — высота у всех одна, фото целиком, без обрезки и пустых полос.
+ # Неполный последний ряд не растягивается: снимок занимает ширину одной колонки.
+ out=''
+ for i in range(0,len(xs),cols):
+  row=xs[i:i+cols];partial=len(row)<cols and len(xs)>1
+  items=''
+  for x in row:
+   w,h=natural(x['src']);fig=photo(x,sizes='grid-2')
+   if w and h:fig=fig.replace('<figure class="site-photo ','<figure style="--ar:'+f'{w/h:.4f}'+'" class="site-photo ',1)
+   items+=fig
+  out+='<div class="photo-row'+(' photo-row-partial' if partial else '')+'">'+items+'</div>'
+ return '<div class="image-gallery photo-rows" style="--cols:'+str(cols)+'">'+out+'</div>'
 def cp(id,n=0):return M['cases'][id][n]
 P=M['production'];T=M['technology'];O=M['gallery']['Офис']
 hero_by_url={
@@ -58,17 +72,19 @@ def apply_all_photos(p,body):
    s=re.sub(r'<svg.*?</svg>',picture(M['team'][name]['src'],name,cls='team-portrait',sizes='portrait'),s,count=1,flags=re.S)
   return s
  body=re.sub(r'<article class="person-card">.*?</article>',person,body,flags=re.S)
- def section(anchor,xs):
+ def section(anchor,xs,fit=False):
   nonlocal body
   pattern=r'(<section\b[^>]*id="'+re.escape(anchor)+r'"[^>]*>)(.*?)(</section>)'
   def put(m):
    s=m.group(2)
    pos=s.rfind('</div></div>')
-   if pos>=0:s=s[:pos]+grid(xs)+s[pos:]
+   # Колонок столько же, сколько было в сетке: в широкой секции три, в узкой две.
+   g=rows(xs,3 if 'section-full' in m.group(1) else 2) if fit else grid(xs)
+   if pos>=0:s=s[:pos]+g+s[pos:]
    return m.group(1)+s+m.group(3)
   body=re.sub(pattern,put,body,count=1,flags=re.S)
  if path=='/technology/':
-  for anchor,indices in {'foundation':[0,1,2,3,4,5],'frame':[19,20],'cover':[22,24,25],'insulation':[23],'gates':[21],'heating':[13,14,15,16,17,18],'ventilation':[6,7],'power':[8,9],'fire':[10,11,12],'cranes':[26,27,28]}.items():section(anchor,[T[i] for i in indices])
+  for anchor,indices in {'foundation':[0,1,2,3,4,5],'frame':[19,20],'cover':[22,24,25],'insulation':[23],'gates':[21],'heating':[13,14,15,16,17,18],'ventilation':[6,7],'power':[8,9],'fire':[10,11,12],'cranes':[26,27,28]}.items():section(anchor,[T[i] for i in indices],fit=True)
  if path=='/production/':
   for anchor,indices in {'section-1':[2,3],'section-2':[1],'section-4':[4,5]}.items():section(anchor,[P[i] for i in indices])
  if path=='/dostavka/':section('section-1',[P[4]]);section('section-2',[P[5]])

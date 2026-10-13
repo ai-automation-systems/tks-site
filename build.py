@@ -12,7 +12,7 @@ SOURCE=(ROOT/'content/source.txt').read_text()
 PUBLISH=True
 SITE='https://t-karkas.ru'
 # Плавающая кнопка обратной связи. Ссылка на профиль MAX — из приложения (аватар, QR-код, «Поделиться»).
-TG_URL='https://t.me/+79309183075'
+TG_URL='https://t.me/t_karkas'
 MAX_URL='https://max.ru/u/f9LHodD0cOKQBGliDNw6x-4RhdUvum-wPFsfeLLjZmzKhFHcrkmc59rNsNM'
 # Яндекс.Метрика (счётчик партнёра). Ставится только в режиме публикации, чтобы локальные сборки не портили статистику.
 YM_ID=113580272
@@ -318,7 +318,7 @@ def mobile_cta():
  # Постоянный доступ к звонку и расчёту на телефоне: в шапке для них нет места.
  return '<div class="mobile-cta"><a class="cta-call" href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a class="cta-quote" href="/raschet/">Рассчитать ангар</a></div>'
 def footer():
- return '<footer class="footer"><div class="shell footer-grid"><div><a class="brand" href="/">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><p>Проектируем, производим и монтируем каркасные ангары. Доставка по России.</p></div><div class="footer-links">'+''.join(f'<a href="{u}">{e(labels[u])}</a>' for u in ['/angary/','/technology/','/projects/','/production/','/tendery/','/materials/','/career/','/gallery/'])+'</div><div class="footer-contact"><a href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a href="mailto:t-karkas@yandex.ru">t-karkas@yandex.ru</a><div class="social"><a class="brand-link" href="'+MAX_URL+'" target="_blank" rel="noopener"><img src="/img/logos/max.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Написать нам в MAX'+icon('external')+'</a></div></div></div><div class="shell footer-bottom"><span>© '+str(YEAR)+' Тентовые конструкции</span><a href="'+PRIVACY_URL+'">Политика конфиденциальности</a><a class="footer-author" href="https://2vlad.ru" target="_blank" rel="noopener" data-goal="author_click"><span>Сделано в</span><span class="footer-author-mark" aria-hidden="true"></span><span class="sr-only">2VLAD</span></a></div></footer>'
+ return '<footer class="footer"><div class="shell footer-grid"><div><a class="brand" href="/">'+icon('hangar')+'<span>ТЕНТОВЫЕ<br>КОНСТРУКЦИИ</span></a><p>Проектируем, производим и монтируем каркасные ангары. Доставка по России.</p></div><div class="footer-links">'+''.join(f'<a href="{u}">{e(labels[u])}</a>' for u in ['/angary/','/technology/','/projects/','/production/','/tendery/','/materials/','/career/','/gallery/'])+'</div><div class="footer-contact"><a href="tel:+78006004626">'+icon('phone')+'8 800 600-46-26</a><a href="mailto:t-karkas@yandex.ru">t-karkas@yandex.ru</a><div class="social"><a class="brand-link" href="'+TG_URL+'" target="_blank" rel="noopener"><img src="/img/logos/telegram.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Написать нам в Telegram'+icon('external')+'</a><a class="brand-link" href="'+MAX_URL+'" target="_blank" rel="noopener"><img src="/img/logos/max.svg" alt="" width="14" height="14" loading="lazy" decoding="async">Написать нам в MAX'+icon('external')+'</a></div></div></div><div class="shell footer-bottom"><span>© '+str(YEAR)+' Тентовые конструкции</span><a href="'+PRIVACY_URL+'">Политика конфиденциальности</a><a class="footer-author" href="https://2vlad.ru" target="_blank" rel="noopener" data-goal="author_click"><span>Сделано в</span><span class="footer-author-mark" aria-hidden="true"></span><span class="sr-only">2VLAD</span></a></div></footer>'
 
 from img_tag import best as img_best
 

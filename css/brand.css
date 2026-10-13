@@ -11,6 +11,11 @@
 .footer-legal strong{font-size:var(--fs-sm);font-weight:var(--fw-semi);color:var(--text)}
 .footer .footer-legal p{margin:0}
 .legal-numbers{display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-5)}
+/* Строка о статусе официального представителя со ссылкой на скан сертификата. */
+.footer .footer-legal .legal-cert{display:flex;align-items:flex-start;gap:var(--sp-2);margin-top:var(--sp-1)}
+.legal-cert .icon{flex-shrink:0;width:16px;height:16px;margin-top:.15em;color:var(--accent)}
+.legal-cert a{color:var(--accent);text-decoration:underline;text-underline-offset:.2em;white-space:nowrap}
+.legal-cert a:hover{text-decoration-thickness:2px}
 .footer-legal+.footer-bottom{margin-top:var(--sp-5)}
 
 /* Карточки направлений на главной: рамка 4:3 во всю ширину карточки, снимок целиком, скругление как у всех карточек. */

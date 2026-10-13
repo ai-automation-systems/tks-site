@@ -1,7 +1,9 @@
 """Название, телефон и реквизиты, полученные от партнёра. Применяется ко всем сгенерированным страницам."""
 import re
 LOGO='<svg class="tks-symbol" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M4 33V15L20 6l16 9v18M11 33V19l9-5 9 5v14M4 33h32" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="tks-wordmark">ТКС</span><span class="tks-description">Тентово-каркасные<br>сооружения</span>'
-LEGAL='<div class="shell footer-legal"><strong>ООО «Воронежская строительная компания-Гарант»</strong><div class="legal-numbers"><span>ИНН 3662258649</span><span>КПП 366201001</span><span>ОГРН 1183668001879</span></div><p>Юридический адрес: 394020, г. Воронеж, ул. Антонова-Овсеенко, дом 1, кв. 30.</p></div>'
+# Сертификат партнёра: ВСК-Гарант — официальный представитель производителя «Тентовые конструкции».
+# LEGAL вставляется после замены названия бренда ниже, поэтому имя производителя в нём не подменяется.
+LEGAL='<div class="shell footer-legal"><strong>ООО «Воронежская строительная компания-Гарант»</strong><div class="legal-numbers"><span>ИНН 3662258649</span><span>КПП 366201001</span><span>ОГРН 1183668001879</span></div><p>Юридический адрес: 394020, г. Воронеж, ул. Антонова-Овсеенко, дом 1, кв. 30.</p><p class="legal-cert"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg><span>Официальный представитель производителя ООО «Тентовые конструкции» — <a href="/docs/sertifikat-partnera.pdf" target="_blank" rel="noopener">сертификат партнёра (PDF)</a></span></p></div>'
 def apply_identity(html):
  html=re.sub(r'(<a class="brand"[^>]*>).*?</a>',lambda m:m.group(1)+LOGO+'</a>',html,flags=re.S)
  html=html.replace('Тентовые конструкции','ТКС — Тентово-каркасные сооружения')

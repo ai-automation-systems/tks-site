@@ -35,6 +35,14 @@ picture{display:contents}
 .album-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-5);align-items:start}
 .image-gallery .photo-expand,.album-grid .photo-expand{aspect-ratio:4/3}
 .image-gallery .site-photo img,.album-grid .site-photo img{height:100%;object-fit:contain}
+/* Ряды по пропорциям снимка (all_photos.rows): рамка повторяет соотношение сторон фото,
+   поэтому нет ни обрезки, ни серых полос подложки; высота кадров в ряду одинаковая. */
+.image-gallery.photo-rows,.section-full .image-gallery.photo-rows{grid-template-columns:minmax(0,1fr)}
+.photo-row{display:flex;gap:var(--sp-4);align-items:flex-start;min-width:0}
+.photo-row .site-photo{flex:var(--ar,1.333) 1 0;min-width:0}
+.photo-row-partial .site-photo{flex:0 0 calc((100% - (var(--cols) - 1) * var(--sp-4)) / var(--cols))}
+.image-gallery.photo-rows .photo-expand{aspect-ratio:var(--ar,4/3)}
+.image-gallery.photo-rows .site-photo img{object-fit:cover}
 
 /* Обложка карточки проекта — тоже в натуральную пропорцию. */
 .with-photo{padding-top:0;overflow:hidden}
@@ -102,6 +110,8 @@ picture{display:contents}
  .photo-hero-copy h1{overflow-wrap:break-word}
  .photo-hero-extra{margin-top:var(--sp-5)}
  .image-gallery,.section-full .image-gallery,.case-gallery,.album-grid{grid-template-columns:1fr;gap:var(--sp-3)}
+ .photo-row{flex-direction:column;align-items:stretch;gap:var(--sp-3)}
+ .photo-row .site-photo,.photo-row-partial .site-photo{flex:none;width:100%}
  .case-image-link{margin-inline:calc(var(--sp-5) * -1)}
  .team-portrait{width:104px;height:104px}
  .solution-photo{margin-inline:calc(var(--sp-5) * -1)}
